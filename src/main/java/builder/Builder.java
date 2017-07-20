@@ -1,9 +1,12 @@
 package builder;
 
 import model.Complex;
+import model.Function;
 import plotter.plot.Plot;
 
-public class Builder {
+public abstract class Builder {
+
+    public abstract Plot[] build(Function function, Plot realPlot, Plot imaginaryPlot);
 
     protected Plot[] buildPlotFunction(Complex[] function, Plot[] complexPlot) {
         return new Plot[]{createRealPlot(function, complexPlot[0]), createImaginaryPlot(function, complexPlot[1])};

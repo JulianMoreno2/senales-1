@@ -13,7 +13,6 @@ public class Function {
         this.imaginary = imaginary;
     }
 
-
     public Complex[] buildPoints() {
         Complex[] x = new Complex[pointsAmount];
 
