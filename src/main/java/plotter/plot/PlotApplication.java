@@ -78,6 +78,14 @@ public class PlotApplication extends PlotFrame {
             StringUtilities.exit(0);
         }
     }
+
+    public PlotApplication(PlotBox[] plots) {
+
+        super("PlotApplication", plots);
+        addWindowListener(new WindowClosingAdapter());
+
+        setVisible(true);
+    }
     @Override
     protected void about() {
         JOptionPane

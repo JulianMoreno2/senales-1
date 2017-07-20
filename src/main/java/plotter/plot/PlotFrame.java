@@ -24,12 +24,12 @@ import java.net.URL;
 public class PlotFrame extends JFrame implements PropertyChangeListener, ImageExportable {
 
     public PlotFrame() {
-        this("Ptolemy Plot Frame");
+        this("Default title");
     }
 
 
     public PlotFrame(String title) {
-        this(title, null);
+        this(title, (PlotBox[]) null);
     }
 
 
@@ -41,14 +41,60 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         } catch (Throwable throwable) {
         }
 
+        plot = new PlotBox[1];
         if (plotArg == null) {
-            plot = new Plot();
+            plot[0] = new Plot();
         } else {
-            plot = plotArg;
+            plot[0] = plotArg;
         }
 
-        plot.setBackground(new Color(0xe5e5e5));
+        plot[0].setBackground(new Color(0xe5e5e5));
 
+        setPlotWindows();
+
+        getContentPane().add(plot[0], BorderLayout.CENTER);
+
+        setDimension();
+    }
+
+    public PlotFrame(String title, PlotBox[] plotBoxes){
+
+        super(title);
+
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Throwable throwable) {
+        }
+
+        if (plotBoxes == null) {
+            plot = new PlotBox[2];
+        } else {
+            plot = plotBoxes;
+        }
+
+        plot[0].setBackground(new Color(0xe5e5e5));
+        plot[1].setBackground(new Color(0xe5e5e5));
+
+        setPlotWindows();
+
+        getContentPane().add(plot[0], BorderLayout.CENTER);
+        getContentPane().add(plot[1], BorderLayout.CENTER);
+
+        setDimension();
+
+    }
+
+    private void setDimension() {
+        setSize(500, 300);
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = getSize();
+        int x = (screenSize.width - frameSize.width) / 2;
+        int y = (screenSize.height - frameSize.height) / 2;
+        setLocation(x, y);
+    }
+
+    private void setPlotWindows() {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         editMenu.setMnemonic(KeyEvent.VK_E);
         specialMenu.setMnemonic(KeyEvent.VK_S);
@@ -109,16 +155,6 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         menubar.add(specialMenu);
 
         setJMenuBar(menubar);
-
-        getContentPane().add(plot, BorderLayout.CENTER);
-
-        setSize(500, 300);
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = getSize();
-        int x = (screenSize.width - frameSize.width) / 2;
-        int y = (screenSize.height - frameSize.height) / 2;
-        setLocation(x, y);
     }
 
     @Override
@@ -143,7 +179,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     public void samplePlot() {
         file = null;
         directory = null;
-        plot.samplePlot();
+        plot[0].samplePlot();
     }
 
     @Override
@@ -160,10 +196,10 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         if (plot == null) {
             throw new IOException("No plot to write image from!");
         }
-        plot.exportImage(stream, format);
+        plot[0].exportImage(stream, format);
     }
 
-    public PlotBox plot;
+    public PlotBox[] plot;
 
     protected File directory = null;
 
@@ -191,7 +227,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     }
 
     protected void editFormat() {
-        PlotFormatter fmt = new PlotFormatter(plot);
+        PlotFormatter fmt = new PlotFormatter(plot[0]);
         fmt.openModal();
     }
 
@@ -235,13 +271,13 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
                         extension = name.substring(position + 1);
                     }
                     if (extension.equals("")) {
-                        plot.exportLatex(file);
+                        plot[0].exportLatex(file);
                     } else if (extension.equalsIgnoreCase("eps")) {
                         fout = new FileOutputStream(file);
-                        plot.export(fout);
+                        plot[0].export(fout);
                     } else {
                         fout = new FileOutputStream(file);
-                        plot.exportImage(fout, "gif");
+                        plot[0].exportImage(fout, "gif");
                     }
                 } finally {
                     try {
@@ -294,11 +330,11 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
             FileInputStream input = null;
             try {
-                plot.clear(true);
+                plot[0].clear(true);
                 input = new FileInputStream(file);
                 read(new URL("file", null, directory.getAbsolutePath()),
                         input);
-                plot.repaint();
+                plot[0].repaint();
             } catch (FileNotFoundException ex) {
                 JOptionPane.showMessageDialog(this,
                         "File not found:\n" + ex.toString(),
@@ -334,7 +370,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     protected void printCrossPlatform() {
         PrinterJob job = PrinterJob.getPrinterJob();
         PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
-        job.setPrintable(plot);
+        job.setPrintable(plot[0]);
 
         if (job.printDialog(aset)) {
             try {
@@ -366,7 +402,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
         PrinterJob job = PrinterJob.getPrinterJob();
         job.setPrintService(pdfPrintService);
-        job.setPrintable(plot, job.defaultPage());
+        job.setPrintable(plot[0], job.defaultPage());
 
         PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet();
         Destination destination = new Destination(new File("plot.pdf").toURI());
@@ -384,7 +420,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     protected void printNative() {
         PrinterJob job = PrinterJob.getPrinterJob();
         PageFormat pageFormat = job.pageDialog(job.defaultPage());
-        job.setPrintable(plot, pageFormat);
+        job.setPrintable(plot[0], pageFormat);
 
         if (job.printDialog()) {
             try {
@@ -398,7 +434,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     }
 
     protected void read(URL base, InputStream in) throws IOException {
-        plot.read(in);
+        plot[0].read(in);
     }
 
     protected void save() {
@@ -406,7 +442,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
             FileOutputStream output = null;
             try {
                 output = new FileOutputStream(file);
-                plot.write(output);
+                plot[0].write(output);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(this, "Error writing file:\n"
                         + ex.toString(), "Ptolemy Plot Error",
@@ -512,14 +548,14 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
                 } else if (actionCommand.equals("Help")) {
                     help();
                 } else if (actionCommand.equals("Fill")) {
-                    plot.fillPlot();
+                    plot[0].fillPlot();
                 } else if (actionCommand.equals("Reset axes")) {
-                    plot.resetAxes();
+                    plot[0].resetAxes();
                 } else if (actionCommand.equals("Clear")) {
-                    plot.clear(false);
-                    plot.repaint();
+                    plot[0].clear(false);
+                    plot[0].repaint();
                 } else if (actionCommand.equals("Sample plot")) {
-                    plot.clear(true);
+                    plot[0].clear(true);
                     samplePlot();
                 }
             } catch (Exception exception) {

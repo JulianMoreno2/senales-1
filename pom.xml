@@ -33,7 +33,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>Example</mainClass>
+                            <mainClass>PlotterApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

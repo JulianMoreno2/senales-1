@@ -1,4 +1,4 @@
-import functions.FFT;
+import function.FFT;
 import model.Complex;
 
 public class Main {
@@ -59,10 +59,10 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int n = Integer.parseInt(args[0]);
-        Complex[] x = new Complex[n];
+        int pointsAmount = Integer.parseInt(args[0]);
+        Complex[] x = new Complex[pointsAmount];
 
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < pointsAmount; i++) {
             x[i] = new Complex(i, 0);
             x[i] = new Complex(-2*Math.random() + 1, 0);
         }
@@ -71,4 +71,5 @@ public class Main {
         Complex[] y = FFT.build(x);
         show(y, "y = fft(x)");
     }
+
 }
