@@ -1,5 +1,7 @@
 # Compiled class file
 *.class
+.classpath
+.project
 
 # Log file
 *.log
@@ -24,6 +26,7 @@ hs_err_pid*
 # Folders
 .idea
 target
+.settings
 
 # Other files
 
