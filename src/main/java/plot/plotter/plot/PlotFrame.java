@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -18,22 +17,22 @@ import java.net.URL;
 @SuppressWarnings("serial")
 public class PlotFrame extends JFrame implements PropertyChangeListener, ImageExportable {
 
-    public PlotFrame() {
+    PlotFrame() {
         this("Default title");
     }
 
 
-    public PlotFrame(String title) {
+    private PlotFrame(String title) {
         this(title, (PlotBox[]) null);
     }
 
 
-    public PlotFrame(String title, PlotBox plotArg) {
+    PlotFrame(String title, PlotBox plotArg) {
         super(title);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Throwable throwable) {
+        } catch (Throwable ignored) {
         }
 
         plot = new PlotBox[1];
@@ -52,13 +51,13 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         setDimension();
     }
 
-    public PlotFrame(String title, PlotBox[] plotBoxes){
+    PlotFrame(String title, PlotBox[] plotBoxes){
 
         super(title);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Throwable throwable) {
+        } catch (Throwable ignored) {
         }
 
         if (plotBoxes == null) {
@@ -145,7 +144,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         }
     }
 
-    public void samplePlot() {
+    void samplePlot() {
         file = null;
         directory = null;
         plot[0].samplePlot();
@@ -160,35 +159,35 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
     @Override
     public void writeImage(OutputStream stream, String format)
-            throws PrinterException, IOException {
+            throws IOException {
         if (plot == null) {
             throw new IOException("No plot to write image from!");
         }
         plot[0].exportImage(stream, format);
     }
 
-    public PlotBox[] plot;
+    private final PlotBox[] plot;
 
-    protected File directory = null;
+    File directory = null;
 
-    protected JMenu editMenu = new JMenu("Edit");
+    private final JMenu editMenu = new JMenu("Edit");
 
-    protected File file = null;
+    File file = null;
 
-    protected JMenu fileMenu = new JMenu("File");
+    private final JMenu fileMenu = new JMenu("File");
 
-    protected JMenuBar menubar = new JMenuBar();
+    private final JMenuBar menubar = new JMenuBar();
 
-    protected void close() {
+    void close() {
         dispose();
     }
 
-    protected void editFormat() {
+    private void editFormat() {
         PlotFormatter fmt = new PlotFormatter(plot[0]);
         fmt.openModal();
     }
 
-    protected void export() {
+    private void export() {
         JFileChooser fileDialog = new JFileChooser();
         fileDialog.addChoosableFileFilter(new FolderForLatex());
         fileDialog.addChoosableFileFilter(new EPSFileFilter());
@@ -251,7 +250,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         }
     }
 
-    protected void open() {
+    private void open() {
         JFileChooser fileDialog = new JFileChooser();
         fileDialog.setDialogTitle("Select a plot file");
 
@@ -301,11 +300,11 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         }
     }
 
-    protected void read(URL base, InputStream in) throws IOException {
+    void read(URL base, InputStream in) throws IOException {
         plot[0].read(in);
     }
 
-    protected void save() {
+    private void save() {
         if (file != null) {
             FileOutputStream output = null;
             try {
@@ -329,7 +328,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
         }
     }
 
-    protected void saveAs() {
+    private void saveAs() {
         JFileChooser fileDialog = new JFileChooser();
         fileDialog.addChoosableFileFilter(new PLTOrXMLFileFilter());
         fileDialog.setDialogTitle("Save plot as...");
@@ -364,16 +363,22 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
             String actionCommand = target.getActionCommand();
 
             try {
-                if (actionCommand.equals("Open")) {
-                    open();
-                } else if (actionCommand.equals("Save")) {
-                    save();
-                } else if (actionCommand.equals("SaveAs")) {
-                    saveAs();
-                } else if (actionCommand.equals("Export")) {
-                    export();
-                } else if (actionCommand.equals("Close")) {
-                    close();
+                switch (actionCommand) {
+                    case "Open":
+                        open();
+                        break;
+                    case "Save":
+                        save();
+                        break;
+                    case "SaveAs":
+                        saveAs();
+                        break;
+                    case "Export":
+                        export();
+                        break;
+                    case "Close":
+                        close();
+                        break;
                 }
             } catch (Throwable throwable) {
                 JOptionPane.showMessageDialog(null, "File Menu Exception:\n"
@@ -418,11 +423,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
             String extension = fileOrDirectoryName.substring(dotIndex);
 
-            if (extension.equalsIgnoreCase(".eps")) {
-                return true;
-            } else {
-                return false;
-            }
+            return extension.equalsIgnoreCase(".eps");
         }
 
         @Override
@@ -434,10 +435,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
     static class FolderForLatex extends FileFilter {
         @Override
         public boolean accept(File fileOrDirectory) {
-            if (fileOrDirectory.isDirectory()) {
-                return true;
-            }
-            return false;
+            return fileOrDirectory.isDirectory();
         }
 
         @Override
@@ -462,11 +460,7 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
             String extension = fileOrDirectoryName.substring(dotIndex);
 
-            if (extension.equalsIgnoreCase(".gif")) {
-                return true;
-            } else {
-                return false;
-            }
+            return extension.equalsIgnoreCase(".gif");
         }
 
         @Override
@@ -491,12 +485,8 @@ public class PlotFrame extends JFrame implements PropertyChangeListener, ImageEx
 
             String extension = fileOrDirectoryName.substring(dotIndex);
 
-            if (extension.equalsIgnoreCase(".plt")
-                    || extension.equalsIgnoreCase(".xml")) {
-                return true;
-            } else {
-                return false;
-            }
+            return extension.equalsIgnoreCase(".plt")
+                    || extension.equalsIgnoreCase(".xml");
         }
 
         @Override

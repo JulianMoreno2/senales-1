@@ -1,15 +1,28 @@
 package plot.plotter.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicComboBoxEditor;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.util.*;
 
 public class Query extends JPanel {
 
@@ -53,7 +66,7 @@ public class Query extends JPanel {
         _entryPanel.setBackground(null);
     }
 
-    public JCheckBox addCheckBox(String name, String label, boolean defaultValue) {
+    public void addCheckBox(String name, String label, boolean defaultValue) {
         JLabel lbl = new JLabel(label + ": ");
         lbl.setBackground(_background);
 
@@ -65,23 +78,11 @@ public class Query extends JPanel {
 
         checkbox.addItemListener(new QueryItemListener(this, name));
 
-        return checkbox;
     }
 
-    public void addChoice(String name, String label, Object[] values,
-                          Object defaultChoice) {
-        addChoice(name, label, values, defaultChoice, false);
-    }
-
-    public void addChoice(String name, String label, Object[] values,
-                          Object defaultChoice, boolean editable) {
-        addChoice(name, label, values, defaultChoice, editable, Color.white,
-                Color.black);
-    }
-
-    public JComboBox addChoice(String name, String label, Object[] values,
-                               Object defaultChoice, boolean editable, final Color background,
-                               final Color foreground) {
+    private void addChoice(String name, String label, Object[] values,
+            Object defaultChoice, boolean editable, final Color background,
+            final Color foreground) {
         JLabel lbl = new JLabel(label + ": ");
         lbl.setBackground(_background);
 
@@ -101,85 +102,14 @@ public class Query extends JPanel {
 
         combobox.addItemListener(new QueryItemListener(this, name));
 
-        return combobox;
-    }
-
-    public QueryColorChooser addColorChooser(String name, String label,
-                                             String defaultColor) {
-        JLabel lbl = new JLabel(label + ": ");
-        lbl.setBackground(_background);
-
-        QueryColorChooser colorChooser = new QueryColorChooser(this, name,
-                defaultColor);
-        _addPair(name, lbl, colorChooser, colorChooser);
-        return colorChooser;
-    }
-
-    public JTextArea addDisplay(String name, String label, String theValue) {
-        JLabel lbl = new JLabel(label + ": ");
-        lbl.setBackground(_background);
-
-        JTextArea displayField = new JTextArea(theValue, 1, 10);
-        displayField.setEditable(false);
-        displayField.setBackground(_background);
-        _addPair(name, lbl, displayField, displayField);
-        return displayField;
-    }
-
-    public void addFileChooser(String name, String label, String defaultName,
-                               URI base, File startingDirectory) {
-        addFileChooser(name, label, defaultName, base, startingDirectory, true,
-                false, false, Color.white, Color.black);
-    }
-
-    public void addFileChooser(String name, String label, String defaultName,
-                               URI base, File startingDirectory, boolean save) {
-        addFileChooser(name, label, defaultName, base, startingDirectory, true,
-                false, save, Color.white, Color.black);
-    }
-
-    public void addFileChooser(String name, String label, String defaultName,
-                               URI base, File startingDirectory, boolean allowFiles,
-                               boolean allowDirectories) {
-        addFileChooser(name, label, defaultName, base, startingDirectory,
-                allowFiles, allowDirectories, false, Color.white, Color.black);
-    }
-
-    public void addFileChooser(String name, String label, String defaultName,
-                               URI base, File startingDirectory, Color background, Color foreground) {
-        addFileChooser(name, label, defaultName, base, startingDirectory, true,
-                false, false, background, foreground);
-    }
-
-    public QueryFileChooser addFileChooser(String name, String label,
-                                           String defaultName, URI base, File startingDirectory,
-                                           boolean allowFiles, boolean allowDirectories, Color background,
-                                           Color foreground) {
-        return addFileChooser(name, label, defaultName, base,
-                startingDirectory, allowFiles, allowDirectories, false,
-                background, foreground);
-    }
-
-    public QueryFileChooser addFileChooser(String name, String label,
-                                           String defaultName, URI base, File startingDirectory,
-                                           boolean allowFiles, boolean allowDirectories, boolean save,
-                                           Color background, Color foreground) {
-        JLabel lbl = new JLabel(label + ": ");
-        lbl.setBackground(_background);
-
-        QueryFileChooser fileChooser = new QueryFileChooser(this, name,
-                defaultName, base, startingDirectory, allowFiles,
-                allowDirectories, save, background, foreground);
-        _addPair(name, lbl, fileChooser, fileChooser);
-        return fileChooser;
     }
 
     public void addLine(String name, String label, String defaultValue) {
         addLine(name, label, defaultValue, Color.white, Color.black);
     }
 
-    public void addLine(String name, String label, String defaultValue,
-                        Color background, Color foreground) {
+    private void addLine(String name, String label, String defaultValue,
+            Color background, Color foreground) {
         JLabel lbl = new JLabel(label + ": ");
         lbl.setBackground(_background);
 
@@ -191,28 +121,6 @@ public class Query extends JPanel {
         entryBox.addActionListener(new QueryActionListener(this, name));
 
         entryBox.addFocusListener(new QueryFocusListener(this, name));
-    }
-
-    public JPasswordField addPassword(String name, String label,
-                                      String defaultValue) {
-        return addPassword(name, label, defaultValue, Color.white, Color.black);
-    }
-
-    public JPasswordField addPassword(String name, String label,
-                                      String defaultValue, Color background, Color foreground) {
-        JLabel lbl = new JLabel(label + ": ");
-        lbl.setBackground(_background);
-
-        JPasswordField entryBox = new JPasswordField(defaultValue, _width);
-        entryBox.setBackground(background);
-        entryBox.setForeground(foreground);
-        _addPair(name, lbl, entryBox, entryBox);
-
-        entryBox.addActionListener(new QueryActionListener(this, name));
-
-        entryBox.addFocusListener(new QueryFocusListener(this, name));
-
-        return entryBox;
     }
 
     public void addQueryListener(QueryListener listener) {
@@ -228,7 +136,7 @@ public class Query extends JPanel {
     }
 
     public void addRadioButtons(String name, String label, String[] values,
-                                String defaultValue) {
+            String defaultValue) {
         JLabel lbl = new JLabel(label + ": ");
         lbl.setBackground(_background);
 
@@ -262,124 +170,13 @@ public class Query extends JPanel {
         _addPair(name, lbl, buttonPanel, buttons);
     }
 
-    public void addSelectButtons(String name, String label, String[] values,
-                                 Set initiallySelected) {
-        JLabel lbl = new JLabel(label + ": ");
-        lbl.setBackground(_background);
-
-        FlowLayout flow = new FlowLayout();
-        flow.setAlignment(FlowLayout.LEFT);
-
-        JPanel buttonPanel = new JPanel(flow);
-
-        QueryActionListener listener = new QueryActionListener(this, name);
-
-        if (initiallySelected == null) {
-            initiallySelected = new HashSet();
-        }
-
-        JRadioButton[] buttons = new JRadioButton[values.length];
-
-        for (int i = 0; i < values.length; i++) {
-            JRadioButton checkbox = new JRadioButton(values[i]);
-            buttons[i] = checkbox;
-            checkbox.setBackground(_background);
-
-            checkbox.setOpaque(false);
-
-            if (initiallySelected.contains(values[i])) {
-                checkbox.setSelected(true);
-            }
-
-            buttonPanel.add(checkbox);
-            checkbox.addActionListener(listener);
-        }
-
-        _addPair(name, lbl, buttonPanel, buttons);
-    }
-
-    public void addSeparator() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        JPanel top = new JPanel();
-        top.setPreferredSize(new Dimension(-1, 5));
-        panel.add(top, BorderLayout.NORTH);
-
-        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
-        panel.add(separator, BorderLayout.CENTER);
-
-        JPanel bottom = new JPanel();
-        bottom.setPreferredSize(new Dimension(-1, 5));
-        panel.add(bottom, BorderLayout.SOUTH);
-
-        _constraints.gridwidth = GridBagConstraints.REMAINDER;
-        _constraints.insets = insets;
-        _grid.setConstraints(panel, _constraints);
-        _entryPanel.add(panel);
-
-        _recalculatePreferredSize(panel);
-    }
-
-    public JSlider addSlider(String name, String label, int defaultValue,
-                             int minimum, int maximum) throws IllegalArgumentException {
-        JLabel lbl = new JLabel(label + ": ");
-
-        if (minimum > maximum) {
-            int temp = minimum;
-            minimum = maximum;
-            maximum = temp;
-        }
-
-        if ((defaultValue > maximum) || (defaultValue < minimum)) {
-            throw new IllegalArgumentException("Desired default " + "value \""
-                    + defaultValue + "\" does not fall "
-                    + "between the minimum and maximum.");
-        }
-
-        JSlider slider = new JSlider(minimum, maximum, defaultValue);
-        _addPair(name, lbl, slider, slider);
-        slider.addChangeListener(new SliderListener(this, name));
-        return slider;
-    }
-
-    public void addText(String text, Color color, int alignment) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-
-        JPanel top = new JPanel();
-        top.setPreferredSize(new Dimension(-1, 5));
-        panel.add(top, BorderLayout.NORTH);
-
-        JLabel label = new JLabel(text, alignment);
-        label.setForeground(color);
-        panel.add(label, BorderLayout.CENTER);
-
-        JPanel bottom = new JPanel();
-        bottom.setPreferredSize(new Dimension(-1, 5));
-        panel.add(bottom, BorderLayout.SOUTH);
-
-        _constraints.gridwidth = GridBagConstraints.REMAINDER;
-        _constraints.insets = insets;
-        _grid.setConstraints(panel, _constraints);
-        _entryPanel.add(panel);
-
-        _recalculatePreferredSize(panel);
-    }
-
     public void addTextArea(String name, String label, String theValue) {
         addTextArea(name, label, theValue, Color.white, Color.black, _height,
                 _width);
     }
 
-    public void addTextArea(String name, String label, String theValue,
-                            Color background, Color foreground) {
-        addTextArea(name, label, theValue, background, foreground, _height,
-                _width);
-    }
-
-    public JTextArea addTextArea(String name, String label, String theValue,
-                                 Color background, Color foreground, int height, int width) {
+    private void addTextArea(String name, String label, String theValue,
+            Color background, Color foreground, int height, int width) {
         JLabel lbl = new JLabel(label + ": ");
         lbl.setBackground(_background);
 
@@ -391,17 +188,6 @@ public class Query extends JPanel {
         QueryScrollPane textPane = new QueryScrollPane(textArea);
         _addPair(name, lbl, textPane, textPane);
         textArea.addFocusListener(new QueryFocusListener(this, name));
-        return textArea;
-    }
-
-    public boolean booleanValue(String name) throws NoSuchElementException,
-            IllegalArgumentException {
-        return getBooleanValue(name);
-    }
-
-    public double doubleValue(String name) throws IllegalArgumentException,
-            NoSuchElementException, NumberFormatException {
-        return getDoubleValue(name);
     }
 
     public boolean getBooleanValue(String name) throws NoSuchElementException,
@@ -422,89 +208,13 @@ public class Query extends JPanel {
         }
     }
 
-    public char[] getCharArrayValue(String name) throws NoSuchElementException,
-            IllegalArgumentException {
-        Object result = _entries.get(name);
-
-        if (result == null) {
-            throw new NoSuchElementException("No item named \"" + name
-                    + "\" in the query box.");
-        }
-
-        if (result instanceof JPasswordField) {
-            return ((JPasswordField) result).getPassword();
-        } else {
-            return getStringValue(name).toCharArray();
-        }
-    }
-
-    public double getDoubleValue(String name) throws IllegalArgumentException,
-            NoSuchElementException, NumberFormatException {
-        Object result = _entries.get(name);
-
-        if (result == null) {
-            throw new NoSuchElementException("No item named \"" + name
-                    + " \" in the query box.");
-        }
-
-        if (result instanceof JPasswordField) {
-            throw new IllegalArgumentException("For security reasons, "
-                    + "calling getDoubleValue() on a password field is "
-                    + "not permitted.  Instead, call getCharArrayValue()");
-        } else if (result instanceof JTextField) {
-            return (Double.valueOf(((JTextField) result).getText()))
-                    .doubleValue();
-        } else {
-            throw new IllegalArgumentException("Item named \"" + name
-                    + "\" is not a text line, and hence cannot be converted "
-                    + "to a double value.");
-        }
-    }
-
-    public int getIntValue(String name) throws IllegalArgumentException,
-            NoSuchElementException, NumberFormatException {
-        Object result = _entries.get(name);
-
-        if (result == null) {
-            throw new NoSuchElementException("No item named \"" + name
-                    + " \" in the query box.");
-        }
-
-        if (result instanceof JPasswordField) {
-            throw new IllegalArgumentException("For security reasons, "
-                    + "calling getIntValue() on a password field is "
-                    + "not permitted.  Instead, call getCharArrayValue()");
-        } else if (result instanceof JTextField) {
-            return (Integer.valueOf(((JTextField) result).getText()))
-                    .intValue();
-        } else if (result instanceof JSlider) {
-            return ((JSlider) result).getValue();
-        } else if (result instanceof JComboBox) {
-            return ((JComboBox) result).getSelectedIndex();
-        } else if (result instanceof JToggleButton[]) {
-            JToggleButton[] buttons = (JToggleButton[]) result;
-
-            for (int i = 0; i < buttons.length; i++) {
-                if (buttons[i].isSelected()) {
-                    return i;
-                }
-            }
-
-            return -1;
-        } else {
-            throw new IllegalArgumentException("Item named \"" + name
-                    + "\" is not a text line or slider, and hence "
-                    + "cannot be converted to " + "an integer value.");
-        }
-    }
-
     public Dimension getMaximumSize() {
         Dimension preferred = getPreferredSize();
         preferred.width = Short.MAX_VALUE;
         return preferred;
     }
 
-    public Object getObjectValue(String name) throws NoSuchElementException,
+    private Object getObjectValue(String name) throws NoSuchElementException,
             IllegalArgumentException {
         Object result = _entries.get(name);
 
@@ -537,12 +247,12 @@ public class Query extends JPanel {
             JToggleButton[] buttons = (JToggleButton[]) result;
             StringBuffer toReturn = null;
 
-            for (int i = 0; i < buttons.length; i++) {
-                if (buttons[i].isSelected()) {
+            for (JToggleButton button : buttons) {
+                if (button.isSelected()) {
                     if (toReturn == null) {
-                        toReturn = new StringBuffer(buttons[i].getText());
+                        toReturn = new StringBuffer(button.getText());
                     } else {
-                        toReturn.append(", " + buttons[i].getText());
+                        toReturn.append(", ").append(button.getText());
                     }
                 }
             }
@@ -568,41 +278,11 @@ public class Query extends JPanel {
         return getObjectValue(name).toString();
     }
 
-    public int getTextHeight() {
-        return _height;
-    }
-
-    public int getTextWidth() {
+    private int getTextWidth() {
         return _width;
     }
 
-    public boolean hasEntry(String name) {
-        return _entries.containsKey(name);
-    }
-
-    public int intValue(String name) throws IllegalArgumentException,
-            NoSuchElementException, NumberFormatException {
-        return getIntValue(name);
-    }
-
-    public void notifyListeners() {
-        Iterator names = _entries.keySet().iterator();
-
-        while (names.hasNext()) {
-            String name = (String) names.next();
-            _notifyListeners(name);
-        }
-    }
-
-    public void removeQueryListener(QueryListener listener) {
-        if (_listeners == null) {
-            return;
-        }
-
-        _listeners.remove(listener);
-    }
-
-    public void set(String name, String value) throws NoSuchElementException,
+    private void set(String name, String value) throws NoSuchElementException,
             IllegalArgumentException {
         Object result = _entries.get(name);
 
@@ -619,10 +299,10 @@ public class Query extends JPanel {
             ((QueryScrollPane) result).setText(value);
         } else if (result instanceof JToggleButton) {
             Boolean flag = Boolean.valueOf(value);
-            setBoolean(name, flag.booleanValue());
+            setBoolean(name, flag);
         } else if (result instanceof JSlider) {
             Integer parsed = Integer.valueOf(value);
-            ((JSlider) result).setValue(parsed.intValue());
+            ((JSlider) result).setValue(parsed);
         } else if (result instanceof JComboBox) {
             ((JComboBox) result).setSelectedItem(value);
         } else if (result instanceof JToggleButton[]) {
@@ -635,11 +315,11 @@ public class Query extends JPanel {
 
             JToggleButton[] buttons = (JToggleButton[]) result;
 
-            for (int i = 0; i < buttons.length; i++) {
-                if (selectedValues.contains(buttons[i].getText())) {
-                    buttons[i].setSelected(true);
+            for (JToggleButton button : buttons) {
+                if (selectedValues.contains(button.getText())) {
+                    button.setSelected(true);
                 } else {
-                    buttons[i].setSelected(false);
+                    button.setSelected(false);
                 }
             }
         } else if (result instanceof QueryColorChooser) {
@@ -657,26 +337,20 @@ public class Query extends JPanel {
         previous.put(name, value);
     }
 
-    public void setAndNotify(String name, String value)
-            throws NoSuchElementException, IllegalArgumentException {
-        set(name, value);
-        _notifyListeners(name);
-    }
-
     public void setBackground(Color color) {
         super.setBackground(color);
         _background = color;
 
         Component[] components = getComponents();
 
-        for (int i = 0; i < components.length; i++) {
-            if (!(components[i] instanceof JTextField)) {
-                components[i].setBackground(_background);
+        for (Component component : components) {
+            if (!(component instanceof JTextField)) {
+                component.setBackground(_background);
             }
         }
     }
 
-    public void setBoolean(String name, boolean value)
+    private void setBoolean(String name, boolean value)
             throws NoSuchElementException, IllegalArgumentException {
         Object result = _entries.get(name);
 
@@ -740,8 +414,8 @@ public class Query extends JPanel {
         } else if (result instanceof JToggleButton[]) {
             JToggleButton[] buttons = (JToggleButton[]) result;
 
-            for (int i = 0; i < buttons.length; i++) {
-                buttons[i].setEnabled(value);
+            for (JToggleButton button : buttons) {
+                button.setEnabled(value);
             }
         }
     }
@@ -829,7 +503,7 @@ public class Query extends JPanel {
         }
     }
 
-    public static Color stringToColor(String description) {
+    private static Color stringToColor(String description) {
         String[] specArray = description.split("[{},]");
         float red = 0f;
         float green = 0f;
@@ -876,7 +550,7 @@ public class Query extends JPanel {
             if (specArray.length > i) {
                 alpha = Float.parseFloat(specArray[i]);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         return new Color(red, green, blue, alpha);
     }
@@ -886,12 +560,12 @@ public class Query extends JPanel {
         return getStringValue(name);
     }
 
-    public static final int DEFAULT_ENTRY_HEIGHT = 10;
+    private static final int DEFAULT_ENTRY_HEIGHT = 10;
 
-    public static final int DEFAULT_ENTRY_WIDTH = 30;
+    private static final int DEFAULT_ENTRY_WIDTH = 30;
 
-    protected void _addPair(String name, JLabel label, Component widget,
-                            Object entry) {
+    private void _addPair(String name, JLabel label, Component widget,
+            Object entry) {
 
         _constraints.gridwidth = 1;
         _constraints.insets = leftPadding;
@@ -916,7 +590,7 @@ public class Query extends JPanel {
         _recalculatePreferredSize(widget);
     }
 
-    protected void _recalculatePreferredSize(Component widget) {
+    private void _recalculatePreferredSize(Component widget) {
         Dimension preferredSize = _entryPanel.getPreferredSize();
 
         preferredSize.width += 25;
@@ -937,17 +611,17 @@ public class Query extends JPanel {
         _entryPanel.revalidate();
     }
 
-    protected Color _background = null;
+    private Color _background = null;
 
-    protected GridBagConstraints _constraints;
+    private final GridBagConstraints _constraints;
 
-    protected Map _entries = new HashMap();
+    private final Map _entries = new HashMap();
 
-    protected GridBagLayout _grid;
+    private final GridBagLayout _grid;
 
-    protected Vector _listeners;
+    private Vector _listeners;
 
-    void _notifyListeners(String name) {
+    private void _notifyListeners(String name) {
         if (_listeners != null) {
             String previous = (String) this.previous.get(name);
             String newValue = getStringValue(name);
@@ -970,33 +644,33 @@ public class Query extends JPanel {
 
     private int columns = 1;
 
-    private JPanel _entryPanel = new JPanel();
+    private final JPanel _entryPanel = new JPanel();
 
-    private JScrollPane _entryScrollPane;
+    private final JScrollPane _entryScrollPane;
 
     private int _height = DEFAULT_ENTRY_HEIGHT;
 
-    private Map _labels = new HashMap();
+    private final Map _labels = new HashMap();
 
-    private Insets leftPadding = new Insets(0, 10, 0, 0);
+    private final Insets leftPadding = new Insets(0, 10, 0, 0);
 
     private JTextArea messageArea = null;
 
-    private JScrollPane _messageScrollPane;
+    private final JScrollPane _messageScrollPane;
 
     private boolean messageScrollPaneAdded = false;
 
     private Insets insets = new Insets(0, 0, 0, 0);
 
-    private Map previous = new HashMap();
+    private final Map previous = new HashMap();
 
     private int widgetsHeight = 20;
 
     private int _width = DEFAULT_ENTRY_WIDTH;
 
-    public static class QueryActionListener implements ActionListener {
+    static class QueryActionListener implements ActionListener {
 
-        public QueryActionListener(Query owner, String name) {
+        QueryActionListener(Query owner, String name) {
             this.name = name;
             this.owner = owner;
         }
@@ -1005,14 +679,14 @@ public class Query extends JPanel {
             owner._notifyListeners(name);
         }
 
-        private Query owner;
+        private final Query owner;
 
-        private String name;
+        private final String name;
     }
 
     public static class QueryColorChooser extends Box implements ActionListener {
 
-        public QueryColorChooser(Query owner, String name, String defaultColor) {
+        QueryColorChooser(Query owner, String name, String defaultColor) {
             super(BoxLayout.X_AXIS);
             this.owner = owner;
             entryBox = new JTextField(defaultColor, this.owner.getTextWidth());
@@ -1035,7 +709,7 @@ public class Query extends JPanel {
 
             if (newColor != null) {
                 float[] components = newColor.getRGBComponents(null);
-                StringBuffer string = new StringBuffer("{");
+                StringBuilder string = new StringBuilder("{");
 
                 for (int j = 0; j < components.length; j++) {
                     string.append(components[j]);
@@ -1052,34 +726,34 @@ public class Query extends JPanel {
             }
         }
 
-        public String getSelectedColor() {
+        String getSelectedColor() {
             return entryBox.getText();
         }
 
-        public void setColor(String name) {
+        void setColor(String name) {
             entryBox.setText(name);
         }
 
-        private JTextField entryBox;
+        private final JTextField entryBox;
 
-        private String name;
+        private final String name;
 
-        private Query owner;
+        private final Query owner;
     }
 
     public static class QueryFileChooser extends Box implements ActionListener {
 
         public QueryFileChooser(Query owner, String name, String defaultName,
-                                URI base, File startingDirectory, boolean allowFiles,
-                                boolean allowDirectories) {
+                URI base, File startingDirectory, boolean allowFiles,
+                boolean allowDirectories) {
             this(owner, name, defaultName, base, startingDirectory, allowFiles,
                     allowDirectories, false, Color.white, Color.black);
         }
 
-        public QueryFileChooser(Query owner, String name, String defaultName,
-                                URI base, File startingDirectory, boolean allowFiles,
-                                boolean allowDirectories, boolean save, Color background,
-                                Color foreground) {
+        QueryFileChooser(Query owner, String name, String defaultName,
+                URI base, File startingDirectory, boolean allowFiles,
+                boolean allowDirectories, boolean save, Color background,
+                Color foreground) {
             super(BoxLayout.X_AXIS);
             this.owner = owner;
             this.base = base;
@@ -1162,17 +836,17 @@ public class Query extends JPanel {
                     if (base == null) {
                         try {
                             entryBox.setText(fileChooser.getSelectedFile()
-                                    .getCanonicalPath());
+                                                        .getCanonicalPath());
                         } catch (IOException ex) {
                             entryBox.setText(fileChooser.getSelectedFile()
-                                    .getName());
+                                                        .getName());
                         }
                     } else {
                         File selectedFile = fileChooser.getSelectedFile();
 
                         try {
                             selectedFile = selectedFile.getCanonicalFile();
-                        } catch (IOException ex) {
+                        } catch (IOException ignored) {
                         }
 
                         URI relativeURI = base
@@ -1184,7 +858,7 @@ public class Query extends JPanel {
                             File file = new File(pathName.replace("%20", " "));
                             try {
                                 entryBox.setText(file.getCanonicalPath()
-                                        .replace('\\', '/'));
+                                                     .replace('\\', '/'));
                             } catch (IOException ex) {
                                 entryBox.setText(file.toString());
                             }
@@ -1200,34 +874,34 @@ public class Query extends JPanel {
             }
         }
 
-        public String getSelectedFileName() {
+        String getSelectedFileName() {
             return entryBox.getText();
         }
 
-        public void setFileName(String name) {
+        void setFileName(String name) {
             entryBox.setText(name);
         }
 
-        private Query owner;
+        private final Query owner;
 
-        private URI base;
+        private final URI base;
 
         private JTextField entryBox;
 
         private String name;
 
-        private boolean save;
+        private final boolean save;
 
-        private File startingDirectory;
+        private final File startingDirectory;
 
         private boolean allowFiles;
 
         private boolean allowDirectories;
     }
 
-    public static class QueryFocusListener implements FocusListener {
+    static class QueryFocusListener implements FocusListener {
 
-        public QueryFocusListener(Query owner, String name) {
+        QueryFocusListener(Query owner, String name) {
             this.name = name;
             this.owner = owner;
         }
@@ -1239,13 +913,13 @@ public class Query extends JPanel {
             owner._notifyListeners(name);
         }
 
-        private Query owner;
+        private final Query owner;
 
-        private String name;
+        private final String name;
     }
 
-    public static class QueryItemListener implements ItemListener {
-        public QueryItemListener(Query owner, String name) {
+    static class QueryItemListener implements ItemListener {
+        QueryItemListener(Query owner, String name) {
             this.name = name;
             this.owner = owner;
         }
@@ -1254,14 +928,14 @@ public class Query extends JPanel {
             owner._notifyListeners(name);
         }
 
-        private Query owner;
+        private final Query owner;
 
-        private String name;
+        private final String name;
     }
 
     static class QueryScrollPane extends JScrollPane {
 
-        public JTextArea textArea;
+        final JTextArea textArea;
 
         QueryScrollPane(JTextArea c) {
             super(c);
@@ -1271,18 +945,17 @@ public class Query extends JPanel {
 
         }
 
-        public String getText() {
-            String retval = textArea.getText();
-            return retval;
+        String getText() {
+            return textArea.getText();
         }
 
-        public void setText(String s) {
+        void setText(String s) {
             textArea.setText(s);
         }
     }
 
-    public static class SliderListener implements ChangeListener {
-        public SliderListener(Query owner, String name) {
+    static class SliderListener implements ChangeListener {
+        SliderListener(Query owner, String name) {
             this.name = name;
             this.owner = owner;
         }
@@ -1291,8 +964,8 @@ public class Query extends JPanel {
             owner._notifyListeners(name);
         }
 
-        private Query owner;
+        private final Query owner;
 
-        private String name;
+        private final String name;
     }
 }

@@ -3,7 +3,6 @@ package plot.plotter.plot;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URL;
 
 public interface PlotInterface extends PlotBoxInterface {
 

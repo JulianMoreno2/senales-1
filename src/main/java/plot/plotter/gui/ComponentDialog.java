@@ -7,22 +7,18 @@ import java.awt.event.WindowEvent;
 
 public class ComponentDialog extends JDialog {
 
-    public ComponentDialog(Frame owner, String title, Component component) {
-        this(owner, title, component, null, null);
-    }
-
     public ComponentDialog(Frame owner, String title, Component component,
                            String[] buttons) {
         this(owner, title, component, buttons, null);
     }
 
-    public ComponentDialog(Frame owner, String title, Component component,
-                           String[] buttons, String message) {
+    private ComponentDialog(Frame owner, String title, Component component,
+            String[] buttons, String message) {
         this(owner, title, component, buttons, message, false);
     }
 
-    public ComponentDialog(Frame owner, String title, Component component,
-                           String[] buttons, String message, boolean resizable) {
+    private ComponentDialog(Frame owner, String title, Component component,
+            String[] buttons, String message, boolean resizable) {
         super(owner, title, true);
 
         JPanel panel = new JPanel();
@@ -30,7 +26,7 @@ public class ComponentDialog extends JDialog {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         if (message != null) {
-            messageArea = new JTextArea(message);
+            JTextArea messageArea = new JTextArea(message);
             messageArea.setFont(new Font("SansSerif", Font.PLAIN, 12));
             messageArea.setEditable(false);
             messageArea.setLineWrap(true);
@@ -106,30 +102,23 @@ public class ComponentDialog extends JDialog {
         return buttonPressed;
     }
 
-    public void setMessage(String message) {
-        if (messageArea != null) {
-            messageArea.setText(message);
-        }
-    }
-
-    protected void handleClosing() {
+    private void handleClosing() {
         if ((contents instanceof CloseListener) && !doneHandleClosing) {
             doneHandleClosing = true;
             ((CloseListener) contents).windowClosed(this, buttonPressed);
         }
     }
 
-    public Component contents;
+    private final Component contents;
 
-    protected String buttonPressed = "";
+    private String buttonPressed = "";
 
     private static String[] buttons;
 
-    private static String[] defaultButtons = { "OK", "Cancel" };
+    private static final String[] defaultButtons = { "OK", "Cancel" };
 
     private boolean doneHandleClosing = false;
 
-    private JOptionPane optionPane;
+    private final JOptionPane optionPane;
 
-    private JTextArea messageArea;
 }

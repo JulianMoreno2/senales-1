@@ -2,7 +2,7 @@ package plot.function;
 
 import plot.model.Complex;
 
-public class CircularConvolve {
+class CircularConvolve {
 
     public static Complex[] build(Complex[] x, Complex[] y) {
 

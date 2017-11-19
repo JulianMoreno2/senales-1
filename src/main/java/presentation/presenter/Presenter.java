@@ -12,7 +12,7 @@ abstract class Presenter<T extends Presenter.View> {
         this.view = view;
     }
 
-    public interface View {
+    interface View {
 
     }
 }

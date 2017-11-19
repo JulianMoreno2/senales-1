@@ -2,7 +2,7 @@ package plot.function;
 
 import plot.model.Complex;
 
-public class InverseFFT {
+class InverseFFT {
 
     public static Complex[] build(Complex[] x) {
         int n = x.length;

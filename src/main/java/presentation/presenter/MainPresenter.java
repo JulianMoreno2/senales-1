@@ -8,7 +8,7 @@ import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
 import presentation.presenter.Presenter.View;
 import core.handler.OpenFilesEventHandler;
-import core.handler.OpenPlotEventHandler;
+import core.handler.OpenPulsationPlotEventHandler;
 import core.service.FileCsv;
 import core.service.FileIOService;
 
@@ -30,7 +30,7 @@ public class MainPresenter extends Presenter<View> {
     }
 
     public EventHandler<ActionEvent> onClickOpenPlot() {
-        return new OpenPlotEventHandler(fileCsvPublishSubject);
+        return new OpenPulsationPlotEventHandler(fileCsvPublishSubject);
     }
 
     public interface View extends Presenter.View {

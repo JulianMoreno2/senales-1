@@ -46,19 +46,19 @@ public class OpenFilesEventHandler implements EventHandler<ActionEvent> {
 
         } catch (NullPointerException e) {
             try {
-                throwPopup(new Stage(), "You must choose a file");
+                throwPopup(new Stage());
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }
     }
 
-    private void throwPopup(final Stage stage, String message) throws Exception {
+    private void throwPopup(final Stage stage) throws Exception {
 
         final Button popupButton = new Button("OK");
         final VBox layout = new VBox(60);
         layout.setStyle("-fx-background-color: cornsilk; -fx-padding: 10;");
-        layout.getChildren().add(createPopupContent(message));
+        layout.getChildren().add(createPopupContent());
         layout.getChildren().addAll(popupButton);
         Scene scene = new Scene(layout);
         stage.setScene(scene);
@@ -68,11 +68,11 @@ public class OpenFilesEventHandler implements EventHandler<ActionEvent> {
         stage.show();
     }
 
-    private VBox createPopupContent(String message) {
+    private VBox createPopupContent() {
         final Label label = new Label();
         label.setWrapText(true);
         label.setTextAlignment(TextAlignment.CENTER);
-        label.setText(message);
+        label.setText("You must choose a file");
         final VBox wizBox = new VBox(5);
         wizBox.setAlignment(Pos.CENTER);
         wizBox.getChildren().setAll(label);

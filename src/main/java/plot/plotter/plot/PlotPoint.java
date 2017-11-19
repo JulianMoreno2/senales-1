@@ -3,7 +3,7 @@ package plot.plotter.plot;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
-public class PlotPoint implements Serializable {
+class PlotPoint implements Serializable {
 
     public boolean connected = false;
 

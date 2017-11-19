@@ -11,16 +11,15 @@ import java.util.Hashtable;
 
 import plot.plotter.util.StringUtilities;
 
-public class EPSGraphics extends Graphics {
+class EPSGraphics extends Graphics {
 
-    public EPSGraphics(OutputStream out, int width, int height) {
+    private EPSGraphics(OutputStream out, int width, int height) {
         _width = width;
         _height = height;
         _out = out;
         _buffer.append("%!PS-Adobe-3.0 EPSF-3.0\n");
         _buffer.append("%%Creator: UC Berkeley Plot Package\n");
-        _buffer.append("%%BoundingBox: 50 50 " + (50 + width) + " "
-                + (50 + height) + "\n");
+        _buffer.append("%%BoundingBox: 50 50 ").append(50 + width).append(" ").append(50 + height).append("\n");
         _buffer.append("%%Pages: 1\n");
         _buffer.append("%%Page: 1 1\n");
         _buffer.append("%%LanguageLevel: 2\n");
@@ -92,8 +91,8 @@ public class EPSGraphics extends Graphics {
     public void drawLine(int x1, int y1, int x2, int y2) {
         Point start = _convert(x1, y1);
         Point end = _convert(x2, y2);
-        _buffer.append("newpath " + start.x + " " + start.y + " moveto\n");
-        _buffer.append("" + end.x + " " + end.y + " lineto\n");
+        _buffer.append("newpath ").append(start.x).append(" ").append(start.y).append(" moveto\n");
+        _buffer.append("").append(end.x).append(" ").append(end.y).append(" lineto\n");
         _buffer.append("stroke\n");
     }
 
@@ -103,9 +102,7 @@ public class EPSGraphics extends Graphics {
 
     @Override
     public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-        if (!_polygon(xPoints, yPoints, nPoints)) {
-            return;
-        } else {
+        if (_polygon(xPoints, yPoints, nPoints)) {
             _buffer.append("closepath stroke\n");
         }
     }
@@ -114,18 +111,17 @@ public class EPSGraphics extends Graphics {
     public void drawOval(int x, int y, int width, int height) {
         int radius = width / 2;
         Point center = _convert(x + radius, y + radius);
-        _buffer.append("newpath " + center.x + " " + center.y + " " + radius
-                + " 0 360 arc closepath stroke\n");
+        _buffer.append("newpath ").append(center.x).append(" ").append(center.y).append(" ").append(radius).append(" 0 360 arc closepath stroke\n");
     }
 
     @Override
     public void drawRect(int x, int y, int width, int height) {
         Point start = _convert(x, y);
-        _buffer.append("newpath " + start.x + " " + start.y + " moveto\n");
-        _buffer.append("0 " + -height + " rlineto\n");
-        _buffer.append("" + width + " 0 rlineto\n");
-        _buffer.append("0 " + height + " rlineto\n");
-        _buffer.append("" + -width + " 0 rlineto\n");
+        _buffer.append("newpath ").append(start.x).append(" ").append(start.y).append(" moveto\n");
+        _buffer.append("0 ").append(-height).append(" rlineto\n");
+        _buffer.append("").append(width).append(" 0 rlineto\n");
+        _buffer.append("0 ").append(height).append(" rlineto\n");
+        _buffer.append("").append(-width).append(" 0 rlineto\n");
         _buffer.append("closepath stroke\n");
     }
 
@@ -145,17 +141,17 @@ public class EPSGraphics extends Graphics {
     @Override
     public void drawString(String str, int x, int y) {
         Point start = _convert(x, y);
-        _buffer.append("" + start.x + " " + start.y + " moveto\n");
+        _buffer.append("").append(start.x).append(" ").append(start.y).append(" moveto\n");
 
-        if (str.indexOf("(") > -1 && str.indexOf("\\(") == -1) {
+        if (str.contains("(")) {
             str = StringUtilities.substitute(str, "(", "\\(");
         }
 
-        if (str.indexOf(")") > -1 && str.indexOf("\\)") == -1) {
+        if (str.contains(")") && !str.contains("\\)")) {
             str = StringUtilities.substitute(str, ")", "\\)");
         }
 
-        _buffer.append("(" + str + ") show\n");
+        _buffer.append("(").append(str).append(") show\n");
     }
 
     @Override
@@ -165,9 +161,7 @@ public class EPSGraphics extends Graphics {
 
     @Override
     public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
-        if (!_polygon(xPoints, yPoints, nPoints)) {
-            return;
-        } else {
+        if (_polygon(xPoints, yPoints, nPoints)) {
             _buffer.append("closepath fill\n");
         }
     }
@@ -176,19 +170,18 @@ public class EPSGraphics extends Graphics {
     public void fillOval(int x, int y, int width, int height) {
         int radius = width / 2;
         Point center = _convert(x + radius, y + radius);
-        _buffer.append("newpath " + center.x + " " + center.y + " " + radius
-                + " 0 360 arc closepath fill\n");
+        _buffer.append("newpath ").append(center.x).append(" ").append(center.y).append(" ").append(radius).append(" 0 360 arc closepath fill\n");
     }
 
     @Override
     public void fillRect(int x, int y, int width, int height) {
         Point start = _convert(x, y);
         _fillPattern();
-        _buffer.append("newpath " + start.x + " " + start.y + " moveto\n");
-        _buffer.append("0 " + -height + " rlineto\n");
-        _buffer.append("" + width + " 0 rlineto\n");
-        _buffer.append("0 " + height + " rlineto\n");
-        _buffer.append("" + -width + " 0 rlineto\n");
+        _buffer.append("newpath ").append(start.x).append(" ").append(start.y).append(" moveto\n");
+        _buffer.append("0 ").append(-height).append(" rlineto\n");
+        _buffer.append("").append(width).append(" 0 rlineto\n");
+        _buffer.append("0 ").append(height).append(" rlineto\n");
+        _buffer.append("").append(-width).append(" 0 rlineto\n");
         _buffer.append("closepath gsave fill grestore\n");
         _buffer.append("0.5 setlinewidth 0 setgray [] 0 setdash stroke\n");
 
@@ -240,7 +233,7 @@ public class EPSGraphics extends Graphics {
             _buffer.append("/Helvetica findfont\n");
         }
 
-        _buffer.append("" + size + " scalefont setfont\n");
+        _buffer.append("").append(size).append(" scalefont setfont\n");
         _currentFont = font;
     }
 
@@ -268,7 +261,7 @@ public class EPSGraphics extends Graphics {
             _buffer.append("0.5 setlinewidth\n");
         } else {
             if (_linepattern.containsKey(c)) {
-                _buffer.append((String) _linepattern.get(c) + " 0 setdash\n");
+                _buffer.append(_linepattern.get(c)).append(" 0 setdash\n");
                 _buffer.append("1 setlinewidth\n");
             } else {
                 _buffer.append("0 setgray\n");
@@ -277,7 +270,7 @@ public class EPSGraphics extends Graphics {
                     _patternIndex = 0;
                 }
 
-                _buffer.append(_patterns[_patternIndex] + " 0 setdash\n");
+                _buffer.append(_patterns[_patternIndex]).append(" 0 setdash\n");
                 _buffer.append("1 setlinewidth\n");
                 _linepattern.put(c, _patterns[_patternIndex]);
                 _patternIndex++;
@@ -295,24 +288,6 @@ public class EPSGraphics extends Graphics {
     public void setXORMode(Color c1) {
     }
 
-    public void showpage() {
-        _buffer.append("showpage\n");
-
-        if (_out != null) {
-            PrintWriter output = new PrintWriter(new BufferedOutputStream(_out));
-
-            output.println(_buffer.toString());
-            output.flush();
-        } else {
-            if (_clipboard == null) {
-                _clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            }
-
-            StringSelection sel = new StringSelection(_buffer.toString());
-            _clipboard.setContents(sel, sel);
-        }
-    }
-
     @Override
     public void translate(int x, int y) {
     }
@@ -327,11 +302,11 @@ public class EPSGraphics extends Graphics {
         }
 
         Point start = _convert(xPoints[0], yPoints[0]);
-        _buffer.append("newpath " + start.x + " " + start.y + " moveto\n");
+        _buffer.append("newpath ").append(start.x).append(" ").append(start.y).append(" moveto\n");
 
         for (int i = 1; i < nPoints; i++) {
             Point vertex = _convert(xPoints[i], yPoints[i]);
-            _buffer.append("" + vertex.x + " " + vertex.y + " lineto\n");
+            _buffer.append("").append(vertex.x).append(" ").append(vertex.y).append(" lineto\n");
         }
 
         return true;
@@ -351,28 +326,28 @@ public class EPSGraphics extends Graphics {
                 * blue * bluescale * bluescale + green * green * greenscale
                 * greenscale)
                 / fullscale;
-        _buffer.append("" + graylevel + " setgray\n");
+        _buffer.append("").append(graylevel).append(" setgray\n");
 
-        _buffer.append("%---- rgb: " + red + " " + green + " " + blue + "\n");
+        _buffer.append("%---- rgb: ").append(red).append(" ").append(green).append(" ").append(blue).append("\n");
     }
 
     private Color _currentColor = Color.black;
 
     private Font _currentFont;
 
-    private int _width;
+    private final int _width;
 
-    private int _height;
+    private final int _height;
 
-    private Hashtable _linepattern = new Hashtable();
+    private final Hashtable _linepattern = new Hashtable();
 
-    private OutputStream _out;
+    private final OutputStream _out;
 
-    private StringBuffer _buffer = new StringBuffer();
+    private final StringBuffer _buffer = new StringBuffer();
 
     private Clipboard _clipboard;
 
-    static private String[] _patterns = { "[]", "[1 1]", "[4 4]", "[4 4 1 4]",
+    static private final String[] _patterns = { "[]", "[1 1]", "[4 4]", "[4 4 1 4]",
         "[2 2]", "[4 2 1 2 1 2]", "[5 3 2 3]", "[3 3]", "[4 2 1 2 2 2]",
         "[1 2 5 2 1 2 1 2]", "[4 1 2 1]", };
 

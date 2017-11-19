@@ -1,6 +1,6 @@
 package plot.plotter.gui;
 
-public interface SettableQueryChooser {
+interface SettableQueryChooser {
 
     void setQueryValue(String value);
 

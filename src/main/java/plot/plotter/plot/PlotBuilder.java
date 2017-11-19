@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class PlotBuilder extends Builder{
 
-    public Plot buildPlotContext(String title) {
+    private Plot buildPlotContext(String title) {
 
         Plot plot = new Plot();
 

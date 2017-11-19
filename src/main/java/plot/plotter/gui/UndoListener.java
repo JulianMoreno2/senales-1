@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-public class UndoListener implements UndoableEditListener {
+class UndoListener implements UndoableEditListener {
 
     public UndoListener(JTextComponent textArea) {
 
@@ -35,15 +35,15 @@ public class UndoListener implements UndoableEditListener {
         _redoAction._updateRedoState();
     }
 
-    protected UndoAction _undoAction = new UndoAction();
+    private final UndoAction _undoAction = new UndoAction();
 
-    protected RedoAction _redoAction = new RedoAction();
+    private final RedoAction _redoAction = new RedoAction();
 
-    protected UndoManager _undo = new UndoManager();
+    private final UndoManager _undo = new UndoManager();
 
-    protected class UndoAction extends AbstractAction {
+    class UndoAction extends AbstractAction {
 
-        public UndoAction() {
+        UndoAction() {
             super("Undo");
             setEnabled(false);
         }
@@ -58,7 +58,7 @@ public class UndoListener implements UndoableEditListener {
             _redoAction._updateRedoState();
         }
 
-        protected void _updateUndoState() {
+        void _updateUndoState() {
             if (_undo.canUndo()) {
                 setEnabled(true);
             } else {
@@ -67,8 +67,8 @@ public class UndoListener implements UndoableEditListener {
         }
     }
 
-    protected class RedoAction extends AbstractAction {
-        public RedoAction() {
+    class RedoAction extends AbstractAction {
+        RedoAction() {
             super("Redo");
             setEnabled(false);
         }
@@ -83,7 +83,7 @@ public class UndoListener implements UndoableEditListener {
             _undoAction._updateUndoState();
         }
 
-        protected void _updateRedoState() {
+        void _updateRedoState() {
             if (_undo.canRedo()) {
                 setEnabled(true);
             } else {

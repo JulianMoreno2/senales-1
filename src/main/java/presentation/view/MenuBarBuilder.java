@@ -6,7 +6,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
-public class MenuBarBuilder {
+class MenuBarBuilder {
 
     private EventHandler<ActionEvent> handler;
 
@@ -17,7 +17,7 @@ public class MenuBarBuilder {
     public MenuBar build() {
         MenuBar menuBar = new MenuBar();
         MenuItem openFileMenuItem = createOpenMenuItem();
-        Menu fileMenu = createMenu("File", openFileMenuItem);
+        Menu fileMenu = createMenu(openFileMenuItem);
 
         openFileMenuItem.setOnAction(handler);
 
@@ -25,8 +25,8 @@ public class MenuBarBuilder {
         return menuBar;
     }
 
-    private Menu createMenu(String title, MenuItem... items) {
-        Menu menu = new Menu(title);
+    private Menu createMenu(MenuItem... items) {
+        Menu menu = new Menu("File");
         menu.getItems().setAll(items);
         return menu;
     }

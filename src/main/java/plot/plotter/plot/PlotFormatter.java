@@ -4,7 +4,6 @@ import javax.swing.*;
 
 import plot.plotter.gui.ComponentDialog;
 import plot.plotter.gui.Query;
-import plot.plotter.gui.QueryListener;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 @SuppressWarnings("serial")
-public class PlotFormatter extends JPanel {
+class PlotFormatter extends JPanel {
 
     public PlotFormatter(PlotBox plot) {
         super();
@@ -29,7 +28,7 @@ public class PlotFormatter extends JPanel {
         _wideQuery.addLine("title", "Title", _originalTitle);
 
         _originalCaptions = plot.getCaptions();
-        StringBuffer captionsString = new StringBuffer();
+        StringBuilder captionsString = new StringBuilder();
         for (Enumeration captions = _originalCaptions.elements(); captions
                 .hasMoreElements();) {
             if (captionsString.length() > 0) {
@@ -59,11 +58,11 @@ public class PlotFormatter extends JPanel {
             _wideQuery.addRadioButtons("marks", "Marks", marks, _originalMarks);
         }
 
-        _originalXTicks = plot.getXTicks();
+        Vector[] _originalXTicks = plot.getXTicks();
         String _originalXTicksSpec = "";
 
         if (_originalXTicks != null) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             Vector positions = _originalXTicks[0];
             Vector labels = _originalXTicks[1];
 
@@ -82,11 +81,11 @@ public class PlotFormatter extends JPanel {
 
         _wideQuery.addLine("xticks", "X Ticks", _originalXTicksSpec);
 
-        _originalYTicks = plot.getYTicks();
-        _originalYTicksSpec = "";
+        Vector[] _originalYTicks = plot.getYTicks();
+        String _originalYTicksSpec = "";
 
         if (_originalYTicks != null) {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             Vector positions = _originalYTicks[0];
             Vector labels = _originalYTicks[1];
 
@@ -107,7 +106,7 @@ public class PlotFormatter extends JPanel {
 
         _originalGrid = plot.getGrid();
         _narrowQuery.addCheckBox("grid", "Grid", _originalGrid);
-        _originalStems = false;
+        boolean _originalStems = false;
         _originalConnected = null;
 
         if (plot instanceof Plot) {
@@ -127,65 +126,80 @@ public class PlotFormatter extends JPanel {
             _narrowQuery.addCheckBox("lineStyles", "Use Line Styles",
                     _originalLineStyles);
         }
-        _wideQuery.addQueryListener(new QueryListener() {
-            @Override
-            public void changed(String name) {
-                if (name.equals("title")) {
+        _wideQuery.addQueryListener(name -> {
+            switch (name) {
+                case "title":
                     _plot.setTitle(_wideQuery.getStringValue("title"));
-                } else if (name.equals("caption")) {
+                    break;
+                case "caption":
                     _plot.clearCaptions();
                     String newCaption = _wideQuery.getStringValue("caption");
                     String[] captionsArray = newCaption.split("\\n");
                     for (String element : captionsArray) {
                         _plot.read("captions: " + element);
                     }
-                } else if (name.equals("xlabel")) {
+                    break;
+                case "xlabel":
                     _plot.setXLabel(_wideQuery.getStringValue("xlabel"));
-                } else if (name.equals("ylabel")) {
+                    break;
+                case "ylabel":
                     _plot.setYLabel(_wideQuery.getStringValue("ylabel"));
-                } else if (name.equals("xrange")) {
+                    break;
+                case "xrange":
                     _plot.read("XRange: " + _wideQuery.getStringValue("xrange"));
-                } else if (name.equals("xticks")) {
+                    break;
+                case "xticks": {
                     String spec = _wideQuery.getStringValue("xticks").trim();
                     _plot.read("XTicks: " + spec);
 
-                } else if (name.equals("yticks")) {
+                    break;
+                }
+                case "yticks": {
                     String spec = _wideQuery.getStringValue("yticks").trim();
                     _plot.read("YTicks: " + spec);
 
-                } else if (name.equals("yrange")) {
+                    break;
+                }
+                case "yrange":
                     _plot.read("YRange: " + _wideQuery.getStringValue("yrange"));
-                } else if (name.equals("marks")) {
+                    break;
+                case "marks":
                     ((Plot) _plot).setMarksStyle(_wideQuery
                             .getStringValue("marks"));
-                }
-
-                _plot.repaint();
+                    break;
             }
+
+            _plot.repaint();
         });
 
         _narrowQuery.addQueryListener(name -> {
-            if (name.equals("grid")) {
-                _plot.setGrid(_narrowQuery.getBooleanValue("grid"));
-            } else if (name.equals("stems")) {
-                ((Plot) _plot).setImpulses(_narrowQuery
-                        .getBooleanValue("stems"));
-                _plot.repaint();
-            } else if (name.equals("color")) {
-                _plot.setColor(_narrowQuery.getBooleanValue("color"));
+            switch (name) {
+                case "grid":
+                    _plot.setGrid(_narrowQuery.getBooleanValue("grid"));
+                    break;
+                case "stems":
+                    ((Plot) _plot).setImpulses(_narrowQuery
+                            .getBooleanValue("stems"));
+                    _plot.repaint();
+                    break;
+                case "color":
+                    _plot.setColor(_narrowQuery.getBooleanValue("color"));
 
-            } else if (name.equals("connected")) {
-                _setConnected(_narrowQuery.getBooleanValue("connected"));
-            } else if (name.equals("lineStyles")) {
-                ((Plot) _plot).setLineStyles(_narrowQuery
-                        .getBooleanValue("lineStyles"));
+                    break;
+                case "connected":
+                    _setConnected(_narrowQuery.getBooleanValue("connected"));
+                    break;
+                case "lineStyles":
+                    ((Plot) _plot).setLineStyles(_narrowQuery
+                            .getBooleanValue("lineStyles"));
+                    break;
             }
 
             _plot.repaint();
         });
     }
 
-    public void apply() {
+    private void apply() {
         _plot.setTitle(_wideQuery.getStringValue("title"));
         _plot.setXLabel(_wideQuery.getStringValue("xlabel"));
         _plot.setYLabel(_wideQuery.getStringValue("ylabel"));
@@ -224,7 +238,7 @@ public class PlotFormatter extends JPanel {
         }
     }
 
-    public void restore() {
+    private void restore() {
         _plot.setTitle(_originalTitle);
         _plot.setCaptions(_originalCaptions);
         _plot.setXLabel(_originalXLabel);
@@ -243,7 +257,7 @@ public class PlotFormatter extends JPanel {
         _plot.repaint();
     }
 
-    protected final PlotBox _plot;
+    private final PlotBox _plot;
 
     private void _saveConnected() {
         ArrayList<ArrayList<PlotPoint>> points = ((Plot) _plot)._points;
@@ -276,37 +290,29 @@ public class PlotFormatter extends JPanel {
         }
     }
 
-    private Query _wideQuery;
+    private final Query _wideQuery;
 
-    private Query _narrowQuery;
+    private final Query _narrowQuery;
 
-    private String _originalTitle;
+    private final String _originalTitle;
 
-    private Vector _originalCaptions;
+    private final Vector _originalCaptions;
 
-    private String _originalXLabel;
+    private final String _originalXLabel;
 
-    private String _originalYLabel;
+    private final String _originalYLabel;
 
     private String _originalMarks;
 
-    private String _originalYTicksSpec;
+    private final double[] _originalXRange;
 
-    private double[] _originalXRange;
+    private final double[] _originalYRange;
 
-    private double[] _originalYRange;
-
-    private Vector[] _originalXTicks;
-
-    private Vector[] _originalYTicks;
-
-    private boolean _originalGrid;
+    private final boolean _originalGrid;
 
     private boolean _originalLineStyles;
 
-    private boolean _originalStems;
-
-    private boolean _originalColor;
+    private final boolean _originalColor;
 
     private boolean[][] _originalConnected;
 

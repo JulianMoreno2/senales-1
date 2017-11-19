@@ -16,6 +16,7 @@ package plot.model;
  *  tan(a)       = -6.685231390246571E-6 + 1.0000103108981198i
  **************************************************************/
 
+@SuppressWarnings("unused")
 public class Complex {
     private final double re;
     private final double im;
@@ -69,7 +70,7 @@ public class Complex {
         return new Complex(re, -im);
     }
 
-    public Complex reciprocal() {
+    private Complex reciprocal() {
         double scale = re*re + im*im;
         return new Complex(re / scale, -im / scale);
     }
@@ -77,7 +78,7 @@ public class Complex {
     public double re() { return re; }
     public double im() { return im; }
 
-    public Complex divides(Complex b) {
+    private Complex divides(Complex b) {
         Complex a = this;
         return a.times(b.reciprocal());
     }
@@ -86,11 +87,11 @@ public class Complex {
         return new Complex(Math.exp(re) * Math.cos(im), Math.exp(re) * Math.sin(im));
     }
 
-    public Complex sin() {
+    private Complex sin() {
         return new Complex(Math.sin(re) * Math.cosh(im), Math.cos(re) * Math.sinh(im));
     }
 
-    public Complex cos() {
+    private Complex cos() {
         return new Complex(Math.cos(re) * Math.cosh(im), -Math.sin(re) * Math.sinh(im));
     }
 
@@ -101,8 +102,7 @@ public class Complex {
     public static Complex plus(Complex a, Complex b) {
         double real = a.re + b.re;
         double imag = a.im + b.im;
-        Complex sum = new Complex(real, imag);
-        return sum;
+        return new Complex(real, imag);
     }
 
     public boolean equals(Object x) {

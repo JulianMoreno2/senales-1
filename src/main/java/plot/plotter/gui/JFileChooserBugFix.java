@@ -6,7 +6,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.awt.*;
 
-public class JFileChooserBugFix {
+class JFileChooserBugFix {
 
     public JFileChooserBugFix() {
         HTMLEditorKit = new HTMLEditorKit();
@@ -40,7 +40,7 @@ public class JFileChooserBugFix {
                     "body").getAttribute(
                     javax.swing.text.StyleConstants.ResolveAttribute);
             background = styleSheet.getBackground(bodyAttribute);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
 
         try {

@@ -3,7 +3,7 @@ package core.provider;
 import javafx.stage.FileChooser;
 import core.service.FileIOService;
 
-public class ServiceProvider {
+class ServiceProvider {
 
     public static FileChooser provideFileChooser(String title) {
         final FileChooser fileChooser = new FileChooser();

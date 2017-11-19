@@ -1,29 +1,45 @@
 package plot.plotter.plot;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Vector;
+
 import javax.imageio.ImageIO;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
 
 import plot.plotter.util.StringUtilities;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.Timer;
-
 @SuppressWarnings("serial")
 public class PlotBox extends JPanel implements PlotBoxInterface {
 
-    public PlotBox() {
+    PlotBox() {
         setOpaque(true);
         fillPlot();
         setLayout(new FlowLayout(FlowLayout.RIGHT, 2, 2));
@@ -49,7 +65,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
 
         _legendStrings.addElement(legend);
-        _legendDatasets.addElement(Integer.valueOf(dataset));
+        _legendDatasets.addElement(dataset);
     }
 
     @Override
@@ -61,7 +77,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _xticklabels = new Vector();
         }
 
-        _xticks.addElement(Double.valueOf(position));
+        _xticks.addElement(position);
         _xticklabels.addElement(label);
     }
 
@@ -74,7 +90,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _yticklabels = new Vector();
         }
 
-        _yticks.addElement(Double.valueOf(position));
+        _yticks.addElement(position);
         _yticklabels.addElement(label);
     }
 
@@ -96,14 +112,13 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _yRangeGiven = false;
             _originalXRangeGiven = false;
             _originalYRangeGiven = false;
-            _rangesGivenByZooming = false;
+            boolean _rangesGivenByZooming = false;
             _xlog = false;
             _ylog = false;
             _grid = true;
             _wrap = false;
             _usecolor = true;
 
-            _filespec = null;
             _xlabel = null;
             _ylabel = null;
             _title = null;
@@ -139,12 +154,12 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _deferredActions.add(action);
 
             if (!_actionsDeferred) {
-                Runnable doActions = () -> _executeDeferredActions();
+                Runnable doActions = this::_executeDeferredActions;
 
                 try {
                     _actionsDeferred = true;
                     SwingUtilities.invokeLater(doActions);
-                } catch (Throwable throwable) {
+                } catch (Throwable ignored) {
                 }
 
             }
@@ -189,20 +204,20 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         removeAll();
     }
 
-    public synchronized BufferedImage exportImage() {
+    private synchronized BufferedImage exportImage() {
         Rectangle rectangle = new Rectangle(_preferredWidth, _preferredHeight);
         return exportImage(new BufferedImage(rectangle.width, rectangle.height,
-                BufferedImage.TYPE_INT_ARGB), rectangle,
+                        BufferedImage.TYPE_INT_ARGB), rectangle,
                 _defaultImageRenderingHints(), false);
     }
 
     public synchronized BufferedImage exportImage(Rectangle rectangle) {
         return exportImage(new BufferedImage(rectangle.width, rectangle.height,
-                BufferedImage.TYPE_INT_ARGB), rectangle,
+                        BufferedImage.TYPE_INT_ARGB), rectangle,
                 _defaultImageRenderingHints(), false);
     }
 
-    public synchronized BufferedImage exportImage(BufferedImage bufferedImage,
+    private synchronized BufferedImage exportImage(BufferedImage bufferedImage,
             Rectangle rectangle, RenderingHints hints, boolean transparent) {
         Graphics2D graphics = bufferedImage.createGraphics();
         graphics.addRenderingHints(_defaultImageRenderingHints());
@@ -275,7 +290,6 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             String message = "Apologies, but export to Latex is not implemented yet.";
             JOptionPane.showMessageDialog(this, message,
                     "Ptolemy Plot Message", JOptionPane.ERROR_MESSAGE);
-            return;
         } catch (Throwable throwable) {
             String message = "Export failed: " + throwable.getMessage();
             JOptionPane.showMessageDialog(this, message,
@@ -343,9 +357,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 name = name.substring(1);
             }
 
-            Color col = new Color(Integer.parseInt(name, 16));
-            return col;
-        } catch (NumberFormatException e) {
+            return new Color(Integer.parseInt(name, 16));
+        } catch (NumberFormatException ignored) {
         }
 
         String[][] names = { { "black", "00000" }, { "white", "ffffff" },
@@ -355,9 +368,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         for (String[] name2 : names) {
             if (name.equals(name2[0])) {
                 try {
-                    Color col = new Color(Integer.parseInt(name2[1], 16));
-                    return col;
-                } catch (NumberFormatException e) {
+                    return new Color(Integer.parseInt(name2[1], 16));
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -372,7 +384,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     @Override
     public synchronized String getLegend(int dataset) {
-        int idx = _legendDatasets.indexOf(Integer.valueOf(dataset), 0);
+        int idx = _legendDatasets.indexOf(dataset, 0);
 
         if (idx != -1) {
             return (String) _legendStrings.elementAt(idx);
@@ -389,7 +401,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             return -1;
         }
 
-        return ((Integer) _legendDatasets.get(index)).intValue();
+        return (Integer) _legendDatasets.get(index);
     }
 
     @Override
@@ -439,7 +451,6 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         } else {
             result[0] = _xMin + (_xMax - _xMin) * _padding;
             result[1] = _xMax - (_xMax - _xMin) * _padding;
-            ;
         }
 
         return result;
@@ -485,7 +496,6 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         } else {
             result[0] = _yMin + (_yMax - _yMin) * _padding;
             result[1] = _yMax - (_yMax - _yMin) * _padding;
-            ;
         }
 
         return result;
@@ -515,7 +525,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             Graphics2D offScreenGraphics = newPlotImage.createGraphics();
             super.paintComponent(offScreenGraphics);
-            _drawPlot(offScreenGraphics, true);
+            _drawPlot(offScreenGraphics);
         }
 
         graphics.drawImage(newPlotImage, 0, 0, null);
@@ -523,19 +533,16 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     @Override
     public synchronized void read(InputStream in) throws IOException {
-        try {
-            BufferedReader din = new BufferedReader(new InputStreamReader(in));
 
-            try {
-                String line = din.readLine();
+        try (BufferedReader din = new BufferedReader(new InputStreamReader(in))) {
 
-                while (line != null) {
-                    _parseLine(line);
-                    line = din.readLine();
-                }
-            } finally {
-                din.close();
+            String line = din.readLine();
+
+            while (line != null) {
+                _parseLine(line);
+                line = din.readLine();
             }
+
         } catch (IOException e) {
             _errorMsg = new String[2];
             _errorMsg[0] = "Failure reading input data.";
@@ -556,7 +563,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         boolean found = false;
 
         for (int i = 0; i < len && !found; ++i) {
-            if (((Integer) _legendDatasets.get(i)).intValue() == dataset) {
+            if ((Integer) _legendDatasets.get(i) == dataset) {
                 foundIndex = i;
                 found = true;
             }
@@ -570,7 +577,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     @Override
     public synchronized void renameLegend(int dataset, String newName) {
-        int index = _legendDatasets.indexOf(Integer.valueOf(dataset), 0);
+        int index = _legendDatasets.indexOf(dataset, 0);
 
         if (index != -1) {
             _legendStrings.setElementAt(newName, index);
@@ -636,7 +643,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _resetButton.setBorderPainted(false);
         _resetButton.setPreferredSize(new Dimension(80, 20));
         _resetButton
-        .setToolTipText("Reset X and Y ranges to their original values");
+                .setToolTipText("Reset X and Y ranges to their original values");
         _resetButton.addActionListener(new ButtonListener());
         add(_resetButton);
         _resetButton.setVisible(true);
@@ -650,8 +657,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _formatButton.setVisible(visible);
 
         _pulsations = new JButton("Pulsations");
-        
-      
+
         _pulsations.setBorderPainted(false);
         _pulsations.setPreferredSize(new Dimension(60, 20));
         _pulsations.setToolTipText("Pulsation per minute");
@@ -672,7 +678,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _usecolor = useColor;
     }
 
-    public synchronized void setColors(Color[] colors) {
+    private synchronized void setColors(Color[] colors) {
         _plotImage = null;
         _colors = colors;
     }
@@ -707,7 +713,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _labelFontMetrics = getFontMetrics(_labelFont);
     }
 
-    public synchronized void setPlotRectangle(Rectangle rectangle) {
+    private synchronized void setPlotRectangle(Rectangle rectangle) {
         _plotImage = null;
         _specifiedPlotRectangle = rectangle;
     }
@@ -860,9 +866,10 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
 
         if (_captionStrings != null) {
-            for (@SuppressWarnings("rawtypes")
-			Enumeration captions = _captionStrings.elements(); captions
-                    .hasMoreElements();) {
+            for (
+                    @SuppressWarnings("rawtypes")
+                    Enumeration captions = _captionStrings.elements(); captions
+                            .hasMoreElements(); ) {
                 String captionLine = (String) captions.nextElement();
                 output.println("<caption>" + captionLine + "</caption>");
             }
@@ -893,7 +900,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             for (int i = 0; i <= last; i++) {
                 output.println("  <tick label=\""
-                        + (String) _xticklabels.elementAt(i) + "\" position=\""
+                        + _xticklabels.elementAt(i) + "\" position=\""
                         + _xticks.elementAt(i) + "\"/>");
             }
 
@@ -907,7 +914,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             for (int i = 0; i <= last; i++) {
                 output.println("  <tick label=\""
-                        + (String) _yticklabels.elementAt(i) + "\" position=\""
+                        + _yticklabels.elementAt(i) + "\" position=\""
                         + _yticks.elementAt(i) + "\"/>");
             }
 
@@ -945,16 +952,16 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     public static final String PTPLOT_RELEASE = "5.10";
 
-    protected boolean _automaticRescale() {
+    boolean _automaticRescale() {
         return _automaticRescale;
     }
 
-    protected synchronized void _drawPlot(Graphics graphics, boolean clearfirst) {
+    private synchronized void _drawPlot(Graphics graphics) {
         Rectangle bounds = getBounds();
-        _drawPlot(graphics, clearfirst, bounds);
+        _drawPlot(graphics, true, bounds);
     }
 
-    protected synchronized void _drawPlot(Graphics graphics,
+    synchronized void _drawPlot(Graphics graphics,
             boolean clearfirst, Rectangle drawRect) {
         if (graphics == null) {
             return;
@@ -997,9 +1004,9 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         if (_specifiedPlotRectangle != null) {
             workingPlotRectangle = new Rectangle(Math.max(0,
                     _specifiedPlotRectangle.x), Math.max(0,
-                            _specifiedPlotRectangle.y), Math.min(drawRect.width,
-                                    _specifiedPlotRectangle.width), Math.min(drawRect.height,
-                                            _specifiedPlotRectangle.height));
+                    _specifiedPlotRectangle.y), Math.min(drawRect.width,
+                    _specifiedPlotRectangle.width), Math.min(drawRect.height,
+                    _specifiedPlotRectangle.height));
         }
 
         int titley = 0;
@@ -1009,6 +1016,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _title = "";
         }
 
+        int _topPadding = 10;
         titley = titlefontheight + _topPadding;
 
         int captionHeight = _captionStrings.size()
@@ -1025,6 +1033,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         int halflabelheight = labelheight / 2;
 
         int ySPos = drawRect.height - captionHeight - 5;
+        int _rightPadding = 10;
         int xSPos = drawRect.width - _rightPadding;
 
         if (_xlog) {
@@ -1133,6 +1142,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         if (workingPlotRectangle != null) {
             _ulx = workingPlotRectangle.x;
         } else {
+            int _leftPadding = 10;
             if (_ylabel != null) {
                 _ulx = widesty + _labelFontMetrics.stringWidth("W")
                         + _leftPadding;
@@ -1218,7 +1228,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
                     for (double ypos = _gridStep(unlabeledgrid, yStart,
                             tmpStep, _ylog); ypos <= _ytickMax; ypos = _gridStep(
-                                    unlabeledgrid, ypos, tmpStep, _ylog)) {
+                            unlabeledgrid, ypos, tmpStep, _ylog)) {
                         int yCoord1 = _lry
                                 - (int) ((ypos - _ytickMin) * _ytickscale);
 
@@ -1243,7 +1253,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 graphics.setFont(_superscriptFont);
                 graphics.drawString(Integer.toString(_yExp),
                         _labelFontMetrics.stringWidth("x10") + 2, titley
-                        - halflabelheight);
+                                - halflabelheight);
                 graphics.setFont(_labelFont);
             }
         } else {
@@ -1252,7 +1262,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             while (nl.hasMoreElements()) {
                 String label = (String) nl.nextElement();
-                double ypos = ((Double) nt.nextElement()).doubleValue();
+                double ypos = (Double) nt.nextElement();
 
                 if (ypos > _yMax || ypos < _yMin) {
                     continue;
@@ -1374,7 +1384,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 if (unlabeledgrid.size() > 0) {
                     for (double xpos = _gridStep(unlabeledgrid, xTmpStart,
                             tmpStep, _xlog); xpos <= _xtickMax; xpos = _gridStep(
-                                    unlabeledgrid, xpos, tmpStep, _xlog)) {
+                            unlabeledgrid, xpos, tmpStep, _xlog)) {
                         xCoord1 = _ulx
                                 + (int) ((xpos - _xtickMin) * _xtickscale);
 
@@ -1407,7 +1417,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             while (nl.hasMoreElements()) {
                 String label = (String) nl.nextElement();
-                double xpos = ((Double) nt.nextElement()).doubleValue();
+                double xpos = (Double) nt.nextElement();
 
                 if (xpos > _xMax || xpos < _xMin) {
                     continue;
@@ -1486,7 +1496,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         int fontHt = _captionFontMetrics.getHeight();
         int yCapPosn = drawRect.height - captionHeight + 14;
         for (Enumeration captions = _captionStrings.elements(); captions
-                .hasMoreElements();) {
+                .hasMoreElements(); ) {
             String captionLine = (String) captions.nextElement();
             int labelx = _ulx
                     + (width - _captionFontMetrics.stringWidth(captionLine))
@@ -1497,33 +1507,32 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         graphics.setFont(previousFont);
     }
 
-    protected void _drawPoint(Graphics graphics, int dataset, long xpos,
-            long ypos, boolean clip) {
+    void _drawPoint(Graphics graphics, int dataset, long xpos, long ypos) {
         if (graphics == null) {
             return;
         }
 
-        boolean pointinside = ypos <= _lry && ypos >= _uly && xpos <= _lrx
-                && xpos >= _ulx;
+        boolean pointinside = ypos <= _lry && ypos >= _uly && xpos <= _lrx && xpos >= _ulx;
 
-                if (!pointinside && clip) {
-                    return;
-                }
+        if (!pointinside) {
+            return;
+        }
 
-                graphics.fillRect((int) xpos - 6, (int) ypos - 6, 6, 6);
+        graphics.fillRect((int) xpos - 6, (int) ypos - 6, 6, 6);
     }
-    protected String _exportLatexPlotData() {
+
+    String _exportLatexPlotData() {
         return "";
     }
 
-    protected void _help() {
+    private void _help() {
         String message = "Ptolemy plot package\n"
                 + "Only Academic Uses\n";
         JOptionPane.showMessageDialog(this, message,
                 "Ptolemy Plot Help Window", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    protected boolean _parseLine(String line) {
+    boolean _parseLine(String line) {
         String lcLine = line.toLowerCase(Locale.getDefault());
 
         if (lcLine.startsWith("#")) {
@@ -1550,8 +1559,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 try {
                     Double dmin = Double.valueOf(min);
                     Double dmax = Double.valueOf(max);
-                    setXRange(dmin.doubleValue(), dmax.doubleValue());
-                } catch (NumberFormatException e) {
+                    setXRange(dmin, dmax);
+                } catch (NumberFormatException ignored) {
                 }
             }
 
@@ -1566,8 +1575,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 try {
                     Double dmin = Double.valueOf(min);
                     Double dmax = Double.valueOf(max);
-                    setYRange(dmin.doubleValue(), dmax.doubleValue());
-                } catch (NumberFormatException e) {
+                    setYRange(dmin, dmax);
+                } catch (NumberFormatException ignored) {
                 }
             }
 
@@ -1579,43 +1588,23 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             _parsePairs(line.substring(7), false);
             return true;
         } else if (lcLine.startsWith("xlog:")) {
-            if (lcLine.indexOf("off", 5) >= 0) {
-                _xlog = false;
-            } else {
-                _xlog = true;
-            }
+            _xlog = lcLine.indexOf("off", 5) < 0;
 
             return true;
         } else if (lcLine.startsWith("ylog:")) {
-            if (lcLine.indexOf("off", 5) >= 0) {
-                _ylog = false;
-            } else {
-                _ylog = true;
-            }
+            _ylog = lcLine.indexOf("off", 5) < 0;
 
             return true;
         } else if (lcLine.startsWith("grid:")) {
-            if (lcLine.indexOf("off", 5) >= 0) {
-                _grid = false;
-            } else {
-                _grid = true;
-            }
+            _grid = lcLine.indexOf("off", 5) < 0;
 
             return true;
         } else if (lcLine.startsWith("wrap:")) {
-            if (lcLine.indexOf("off", 5) >= 0) {
-                _wrap = false;
-            } else {
-                _wrap = true;
-            }
+            _wrap = lcLine.indexOf("off", 5) < 0;
 
             return true;
         } else if (lcLine.startsWith("color:")) {
-            if (lcLine.indexOf("off", 6) >= 0) {
-                _usecolor = false;
-            } else {
-                _usecolor = true;
-            }
+            _usecolor = lcLine.indexOf("off", 6) < 0;
 
             return true;
         } else if (lcLine.startsWith("captions:")) {
@@ -1626,10 +1615,10 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         return false;
     }
 
-    protected void _resetScheduledTasks() {
+    void _resetScheduledTasks() {
     }
 
-    protected void _scheduledRedraw() {
+    void _scheduledRedraw() {
     }
 
     @Deprecated
@@ -1647,7 +1636,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _padding = padding;
     }
 
-    protected boolean _timedRepaint() {
+    boolean _timedRepaint() {
         return _timedRepaint || _automaticRescale;
     }
 
@@ -1661,7 +1650,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
         if (_captionStrings != null) {
             for (Enumeration captions = _captionStrings.elements(); captions
-                    .hasMoreElements();) {
+                    .hasMoreElements(); ) {
                 String captionLine = (String) captions.nextElement();
                 output.println("Caption: " + captionLine);
             }
@@ -1689,11 +1678,11 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             int last = _xticks.size() - 1;
 
             for (int i = 0; i < last; i++) {
-                output.print("\"" + (String) _xticklabels.elementAt(i) + "\" "
+                output.print("\"" + _xticklabels.elementAt(i) + "\" "
                         + _xticks.elementAt(i) + ", ");
             }
 
-            output.println("\"" + (String) _xticklabels.elementAt(last) + "\" "
+            output.println("\"" + _xticklabels.elementAt(last) + "\" "
                     + _xticks.elementAt(last));
         }
 
@@ -1703,11 +1692,11 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             int last = _yticks.size() - 1;
 
             for (int i = 0; i < last; i++) {
-                output.print("\"" + (String) _yticklabels.elementAt(i) + "\" "
+                output.print("\"" + _yticklabels.elementAt(i) + "\" "
                         + _yticks.elementAt(i) + ", ");
             }
 
-            output.println("\"" + (String) _yticklabels.elementAt(last) + "\" "
+            output.println("\"" + _yticklabels.elementAt(last) + "\" "
                     + _yticks.elementAt(last));
         }
 
@@ -1732,83 +1721,75 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
     }
 
-    protected transient volatile double _yMax = 0;
+    private transient volatile double _yMax = 0;
 
-    protected transient volatile double _yMin = 0;
+    transient volatile double _yMin = 0;
 
-    protected transient volatile double _xMax = 0;
+    private transient volatile double _xMax = 0;
 
-    protected transient volatile double _xMin = 0;
+    transient volatile double _xMin = 0;
 
-    protected volatile double _padding = 0.05;
+    private volatile double _padding = 0.05;
 
-    protected transient BufferedImage _plotImage = null;
+    transient BufferedImage _plotImage = null;
 
-    protected transient boolean _xRangeGiven = false;
+    private transient boolean _xRangeGiven = false;
 
-    protected transient boolean _yRangeGiven = false;
+    private transient boolean _yRangeGiven = false;
 
-    protected transient boolean _rangesGivenByZooming = false;
+    private double _xlowgiven;
 
-    protected double _xlowgiven;
+    private double _xhighgiven;
 
-    protected double _xhighgiven;
+    private double _ylowgiven;
 
-    protected double _ylowgiven;
+    private double _yhighgiven;
 
-    protected double _yhighgiven;
+    double _xBottom = Double.MAX_VALUE;
 
-    protected double _xBottom = Double.MAX_VALUE;
+    double _xTop = -Double.MAX_VALUE;
 
-    protected double _xTop = -Double.MAX_VALUE;
+    double _yBottom = Double.MAX_VALUE;
 
-    protected double _yBottom = Double.MAX_VALUE;
+    double _yTop = -Double.MAX_VALUE;
 
-    protected double _yTop = -Double.MAX_VALUE;
+    boolean _xlog = false;
 
-    protected boolean _xlog = false;
+    boolean _ylog = false;
 
-    protected boolean _ylog = false;
+    static final double _LOG10SCALE = 1 / Math.log(10);
 
-    protected static final double _LOG10SCALE = 1 / Math.log(10);
+    private boolean _grid = true;
 
-    protected boolean _grid = true;
+    boolean _wrap = false;
 
-    protected boolean _wrap = false;
+    double _wrapHigh;
 
-    protected double _wrapHigh;
+    double _wrapLow;
 
-    protected double _wrapLow;
+    Color _background = Color.white;
 
-    protected Color _background = Color.white;
+    Color _foreground = Color.black;
 
-    protected Color _foreground = Color.black;
+    private int _bottomPadding = 5;
 
-    protected int _topPadding = 10;
+    int _ulx = 1;
 
-    protected int _bottomPadding = 5;
+    int _uly = 1;
 
-    protected int _rightPadding = 10;
+    int _lrx = 100;
 
-    protected int _leftPadding = 10;
+    int _lry = 100;
 
-    protected int _ulx = 1;
+    private Rectangle _specifiedPlotRectangle = null;
 
-    protected int _uly = 1;
+    double _yscale = 1.0;
 
-    protected int _lrx = 100;
+    double _xscale = 1.0;
 
-    protected int _lry = 100;
+    volatile boolean _usecolor = true;
 
-    protected Rectangle _specifiedPlotRectangle = null;
-
-    protected double _yscale = 1.0;
-
-    protected double _xscale = 1.0;
-
-    protected volatile boolean _usecolor = true;
-
-    static protected Color[] _colors = {
+    static Color[] _colors = {
             new Color(0xff0000), // red
             new Color(0x0000ff), // blue
             new Color(0x00aaaa), // cyan-ish
@@ -1822,13 +1803,13 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             new Color(0x14ff14), // green-ish
     };
 
-    protected int _width = 500;
+    private int _width = 500;
 
-    protected int _height = 300;
+    private int _height = 300;
 
-    protected int _preferredWidth = 500;
+    private int _preferredWidth = 500;
 
-    protected int _preferredHeight = 300;
+    private int _preferredHeight = 300;
 
     public URL _documentBase = null;
 
@@ -1850,7 +1831,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         while (v.hasMoreElements()) {
             String legend = (String) v.nextElement();
 
-            int dataset = ((Integer) i.nextElement()).intValue();
+            int dataset = (Integer) i.nextElement();
 
             if (dataset >= 0) {
                 if (_usecolor) {
@@ -1858,7 +1839,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                     graphics.setColor(_colors[color]);
                 }
 
-                _drawPoint(graphics, dataset, urx - 3, ypos - 3, false);
+                _drawPoint(graphics, dataset, urx - 3, ypos - 3);
 
                 graphics.setColor(_foreground);
 
@@ -1932,7 +1913,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 * Math.pow(10.0, -numfracdigits));
 
         int dpt = numString.lastIndexOf(".");
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         if (dpt < 0) {
             if (numfracdigits <= 0) {
@@ -2015,20 +1996,19 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             if (oldgrid != null && oldgridi < oldgrid.size()) {
                 while (oldgridi < oldgrid.size()
-                        && ((Double) oldgrid.elementAt(oldgridi)).doubleValue() < logval) {
+                        && (Double) oldgrid.elementAt(oldgridi) < logval) {
                     oldgridi++;
                 }
 
                 if (oldgridi < oldgrid.size()) {
-                    if (Math.abs(((Double) oldgrid.elementAt(oldgridi))
-                            .doubleValue() - logval) > 0.00001) {
-                        grid.addElement(Double.valueOf(logval));
+                    if (Math.abs((Double) oldgrid.elementAt(oldgridi) - logval) > 0.00001) {
+                        grid.addElement(logval);
                     }
                 } else {
-                    grid.addElement(Double.valueOf(logval));
+                    grid.addElement(logval);
                 }
             } else {
-                grid.addElement(Double.valueOf(logval));
+                grid.addElement(logval);
             }
         }
 
@@ -2043,8 +2023,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         double x = low - _gridBase;
 
         for (_gridCurJuke = -1; _gridCurJuke + 1 < grid.size()
-                && x >= ((Double) grid.elementAt(_gridCurJuke + 1))
-                .doubleValue(); _gridCurJuke++) {
+                && x >= (Double) grid.elementAt(_gridCurJuke + 1); _gridCurJuke++) {
         }
         return grid;
     }
@@ -2054,13 +2033,13 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         int i;
 
         for (i = 0; i < grid.size()
-                && x >= ((Double) grid.elementAt(i)).doubleValue(); i++) {
+                && x >= (Double) grid.elementAt(i); i++) {
         }
 
         if (i >= grid.size()) {
             return pos;
         } else {
-            return Math.floor(pos) + ((Double) grid.elementAt(i)).doubleValue();
+            return Math.floor(pos) + (Double) grid.elementAt(i);
         }
     }
 
@@ -2077,7 +2056,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             }
 
             return _gridBase
-                    + ((Double) grid.elementAt(_gridCurJuke)).doubleValue();
+                    + (Double) grid.elementAt(_gridCurJuke);
         } else {
             return pos + step;
         }
@@ -2166,7 +2145,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 String index = pair.substring(close + 1).trim();
 
                 try {
-                    double idx = Double.valueOf(index).doubleValue();
+                    double idx = Double.valueOf(index);
 
                     if (xtick) {
                         addXTick(label, idx);
@@ -2275,7 +2254,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
     }
 
-    void _zoom(int x, int y) {
+    private void _zoom(int x, int y) {
         _zooming = false;
 
         Graphics graphics = getGraphics();
@@ -2284,7 +2263,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             return;
         }
 
-        if (_zoomin == true && _drawn == true) {
+        if (_zoomin && _drawn) {
             if (_zoomxn != -1 || _zoomyn != -1) {
                 int minx = Math.min(_zoomx, _zoomxn);
                 int maxx = Math.max(_zoomx, _zoomxn);
@@ -2332,7 +2311,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
                 repaint();
             }
-        } else if (_zoomout == true && _drawn == true) {
+        } else if (_zoomout && _drawn) {
             graphics.setXORMode(_boxColor);
 
             int x_diff = Math.abs(_zoomx - _zoomxn);
@@ -2351,7 +2330,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
             zoom(newx2, newy2, newx1, newy1);
             repaint();
-        } else if (_drawn == false) {
+        } else if (!_drawn) {
             repaint();
         }
 
@@ -2360,7 +2339,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         _zoomxn = _zoomyn = _zoomx = _zoomy = -1;
     }
 
-    void _zoomBox(int x, int y) {
+    private void _zoomBox(int x, int y) {
         if (!_zooming) {
             return;
         }
@@ -2383,7 +2362,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             x = _ulx;
         }
         if (_zoomx != -1 || _zoomy != -1) {
-            if (_zoomin == false && _zoomout == false) {
+            if (!_zoomin && !_zoomout) {
                 if (y < _zoomy) {
                     _zoomout = true;
                     graphics.setXORMode(_boxColor);
@@ -2393,8 +2372,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 }
             }
 
-            if (_zoomin == true) {
-                if ((_zoomxn != -1 || _zoomyn != -1) && _drawn == true) {
+            if (_zoomin) {
+                if ((_zoomxn != -1 || _zoomyn != -1) && _drawn) {
                     int minx = Math.min(_zoomx, _zoomxn);
                     int maxx = Math.max(_zoomx, _zoomxn);
                     int miny = Math.min(_zoomy, _zoomyn);
@@ -2418,8 +2397,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
                 } else {
                     _drawn = false;
                 }
-            } else if (_zoomout == true) {
-                if ((_zoomxn != -1 || _zoomyn != -1) && _drawn == true) {
+            } else if (_zoomout) {
+                if ((_zoomxn != -1 || _zoomyn != -1) && _drawn) {
                     int x_diff = Math.abs(_zoomx - _zoomxn);
                     int y_diff = Math.abs(_zoomy - _zoomyn);
                     graphics.setXORMode(_boxColor);
@@ -2447,7 +2426,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         graphics.setPaintMode();
     }
 
-    void _zoomStart(int x, int y) {
+    private void _zoomStart(int x, int y) {
         if (y > _lry) {
             y = _lry;
         }
@@ -2473,9 +2452,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     private boolean _automaticRescale = false;
 
-    private LinkedList<Runnable> _deferredActions = new LinkedList<Runnable>();
-
-    private String _filespec = null;
+    private final LinkedList<Runnable> _deferredActions = new LinkedList<>();
 
     private static final Color _boxColor = Color.orange;
 
@@ -2537,17 +2514,17 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
 
     private transient JButton _formatButton = null;
 
-    boolean _originalXRangeGiven = false;
+    private boolean _originalXRangeGiven = false;
 
-    boolean _originalYRangeGiven = false;
+    private boolean _originalYRangeGiven = false;
 
-    double _originalXlow = 0.0;
+    private double _originalXlow = 0.0;
 
-    double _originalXhigh = 0.0;
+    private double _originalXhigh = 0.0;
 
-    double _originalYlow = 0.0;
+    private double _originalYlow = 0.0;
 
-    double _originalYhigh = 0.0;
+    private double _originalYhigh = 0.0;
 
     private transient JButton _printButton = null;
 
@@ -2580,7 +2557,8 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             if (event.getSource() == _pulsations) {
                 fillPlot();
             } else if (event.getSource() == _resetButton) {
-                resetAxes(); fillPlot();
+                resetAxes();
+                fillPlot();
             } else if (event.getSource() == _formatButton) {
                 PlotFormatter fmt = new PlotFormatter(PlotBox.this);
                 fmt.openModal();
@@ -2588,7 +2566,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
     }
 
-    public class ZoomListener implements MouseListener {
+    class ZoomListener implements MouseListener {
 
         @Override
         public void mouseClicked(MouseEvent event) {
@@ -2622,7 +2600,7 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
         }
     }
 
-    public class DragListener implements MouseMotionListener {
+    class DragListener implements MouseMotionListener {
 
         @Override
         public void mouseDragged(MouseEvent event) {
@@ -2644,78 +2622,78 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             int keycode = e.getKeyCode();
 
             switch (keycode) {
-            case KeyEvent.VK_CONTROL:
-                _control = true;
-                break;
+                case KeyEvent.VK_CONTROL:
+                    _control = true;
+                    break;
 
-            case KeyEvent.VK_SHIFT:
-                _shift = true;
-                break;
+                case KeyEvent.VK_SHIFT:
+                    _shift = true;
+                    break;
 
-            case KeyEvent.VK_C:
+                case KeyEvent.VK_C:
 
-                if (_control) {
-                    exportImage(null, "gif");
+                    if (_control) {
+                        exportImage(null, "gif");
 
-                    String message = "GIF image exported to clipboard.";
-                    JOptionPane.showMessageDialog(PlotBox.this, message,
-                            "Ptolemy Plot Message",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
+                        String message = "GIF image exported to clipboard.";
+                        JOptionPane.showMessageDialog(PlotBox.this, message,
+                                "Ptolemy Plot Message",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
 
-                break;
+                    break;
 
-            case KeyEvent.VK_D:
+                case KeyEvent.VK_D:
 
-                if (!_control && _shift) {
-                    write(System.out);
+                    if (!_control && _shift) {
+                        write(System.out);
 
-                    String message = "Plot data sent to standard out.";
-                    JOptionPane.showMessageDialog(PlotBox.this, message,
-                            "Ptolemy Plot Message",
-                            JOptionPane.INFORMATION_MESSAGE);
-                }
+                        String message = "Plot data sent to standard out.";
+                        JOptionPane.showMessageDialog(PlotBox.this, message,
+                                "Ptolemy Plot Message",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    }
 
-                if (_control) {
-                    StringUtilities.exit(1);
-                }
+                    if (_control) {
+                        StringUtilities.exit(1);
+                    }
 
-                break;
+                    break;
 
-            case KeyEvent.VK_F:
+                case KeyEvent.VK_F:
 
-                if (!_control && _shift) {
-                    fillPlot();
-                }
+                    if (!_control && _shift) {
+                        fillPlot();
+                    }
 
-                break;
+                    break;
 
-            case KeyEvent.VK_H:
+                case KeyEvent.VK_H:
 
-                if (!_control && _shift) {
-                    _help();
-                }
+                    if (!_control && _shift) {
+                        _help();
+                    }
 
-                break;
+                    break;
 
-            case KeyEvent.VK_Q:
+                case KeyEvent.VK_Q:
 
-                if (!_control) {
-                    StringUtilities.exit(1);
-                }
+                    if (!_control) {
+                        StringUtilities.exit(1);
+                    }
 
-                break;
+                    break;
 
-            case KeyEvent.VK_SLASH:
+                case KeyEvent.VK_SLASH:
 
-                if (_shift) {
-                    _help();
-                }
+                    if (_shift) {
+                        _help();
+                    }
 
-                break;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
 
@@ -2724,16 +2702,16 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             int keycode = e.getKeyCode();
 
             switch (keycode) {
-            case KeyEvent.VK_CONTROL:
-                _control = false;
-                break;
+                case KeyEvent.VK_CONTROL:
+                    _control = false;
+                    break;
 
-            case KeyEvent.VK_SHIFT:
-                _shift = false;
-                break;
+                case KeyEvent.VK_SHIFT:
+                    _shift = false;
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         }
 
@@ -2747,9 +2725,9 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
     }
 
     private static class TimedRepaint extends Timer {
-        static int _REPAINT_TIME_INTERVAL = 30;
+        static final int _REPAINT_TIME_INTERVAL = 30;
 
-        public synchronized void addListener(PlotBox plotBox) {
+        synchronized void addListener(PlotBox plotBox) {
             _listeners.add(plotBox);
             if (_listeners.size() == 1) {
                 scheduleAtFixedRate(new TimerTask() {
@@ -2767,14 +2745,14 @@ public class PlotBox extends JPanel implements PlotBoxInterface {
             }
         }
 
-        public synchronized void removeListener(PlotBox plotBox) {
+        synchronized void removeListener(PlotBox plotBox) {
             _listeners.remove(plotBox);
             if (_listeners.isEmpty()) {
                 purge();
             }
         }
 
-        private Set<PlotBox> _listeners = new HashSet<PlotBox>();
+        private final Set<PlotBox> _listeners = new HashSet<>();
     }
 
     private static boolean _printedSecurityExceptionMessage = false;

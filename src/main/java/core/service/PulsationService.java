@@ -28,8 +28,7 @@ public class PulsationService {
             }
         }
         double period = ((secondPeak - firstPeak) * 0.01);
-        int value = (int) (60 / period);
-        return value;
+        return (int) (60 / period);
     }
 
     public int getArrhythmiaQuantityPoint() {

@@ -2,7 +2,7 @@ package plot.function;
 
 import plot.model.Complex;
 
-public class Sin {
+class Sin {
 
     public Complex[] points(int pointsAmount){
 

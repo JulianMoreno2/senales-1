@@ -15,5 +15,5 @@ public class RunnableExceptionCatcher implements Runnable {
         }
     }
 
-    private Runnable _runnable;
+    private final Runnable _runnable;
 }

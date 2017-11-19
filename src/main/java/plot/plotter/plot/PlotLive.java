@@ -31,7 +31,7 @@ public abstract class PlotLive extends Plot implements Runnable {
         _startButton.setEnabled(true);
     }
 
-    public void pause() {
+    private void pause() {
         _paused = true;
         _plotting = false;
         _stopButton.setEnabled(false);
@@ -48,7 +48,7 @@ public abstract class PlotLive extends Plot implements Runnable {
                 synchronized (this) {
                     try {
                         wait();
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
@@ -81,7 +81,7 @@ public abstract class PlotLive extends Plot implements Runnable {
         }
     }
 
-    public synchronized void start() {
+    private synchronized void start() {
         _plotting = true;
         _paused = false;
         if (_stopButton != null) {

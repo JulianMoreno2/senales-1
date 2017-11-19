@@ -19,11 +19,11 @@ public class PlotApplication extends PlotFrame {
         this(new String[0]);
     }
 
-    public PlotApplication(String[] args) throws Exception {
+    private PlotApplication(String[] args) throws Exception {
         this(new Plot(), args);
     }
 
-    public PlotApplication(PlotBox plot, String[] args) throws Exception {
+    private PlotApplication(PlotBox plot, String[] args) throws Exception {
 
         super("PlotApplication", plot);
 
@@ -68,7 +68,7 @@ public class PlotApplication extends PlotFrame {
         if (test) {
             try {
                 Thread.sleep(2000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
 
             StringUtilities.exit(0);
@@ -91,7 +91,7 @@ public class PlotApplication extends PlotFrame {
         StringUtilities.exit(0);
     }
 
-    protected int parseArgs(String[] args) throws Exception {
+    private void parseArgs(String[] args) throws Exception {
         int i = 0;
         int argumentsRead;
         String arg;
@@ -109,29 +109,26 @@ public class PlotApplication extends PlotFrame {
                 }
 
                 height = Integer.parseInt(args[i++]);
-                continue;
             } else if (arg.equals("-help")) {
                 System.out.println(usage());
                 StringUtilities.exit(0);
-                continue;
             } else if (arg.equals("-printPDF")) {
-                printPDF = true;
-                continue;
+                /*
+      If true, then print to PDF.
+     */
+                boolean printPDF = true;
             } else if (arg.equals("-test")) {
                 test = true;
-                continue;
             } else if (arg.equals("-version")) {
                 System.out.println("Version " + PlotBox.PTPLOT_RELEASE
                         + ", Build $Id: PlotApplication.java 70402 2014-10-23 00:52:20Z cxh $");
                 StringUtilities.exit(0);
-                continue;
             } else if (arg.equals("-width")) {
                 if (i > args.length - 1) {
                     throw new CmdLineArgException("-width requires an integer argument");
                 }
 
                 width = Integer.parseInt(args[i++]);
-                continue;
             } else if (arg.equals("")) {
             } else if (arg.equals("-")) {
                 URL base = new URL("file", null, "standard input");
@@ -164,10 +161,9 @@ public class PlotApplication extends PlotFrame {
 
         argumentsRead = i;
 
-        return argumentsRead;
     }
 
-    protected String usage() {
+    private String usage() {
         // We use a table here to keep things neat.
         // If we have:
         // {"-bd", "<color>", "Border", "White", "(Unsupported)"},
@@ -180,33 +176,28 @@ public class PlotApplication extends PlotFrame {
         String[][] commandOptions = { { "-height", "<pixels>" }, { "-width", "<pixels>" }, };
 
         String[] commandFlags = { "-help", "-printPDF", "-test", "-version", "-", };
-        StringBuffer result = new StringBuffer(
+        StringBuilder result = new StringBuilder(
                 "Usage: ptplot [ options ] [file ...]\n\n" + "Options that take values:\n");
 
         int i;
 
         for (i = 0; i < commandOptions.length; i++) {
-            result.append(" " + commandOptions[i][0] + " " + commandOptions[i][1] + "\n");
+            result.append(" ").append(commandOptions[i][0]).append(" ").append(commandOptions[i][1]).append("\n");
         }
 
         result.append("\nBoolean flags:\n");
 
         for (i = 0; i < commandFlags.length; i++) {
-            result.append(" " + commandFlags[i]);
+            result.append(" ").append(commandFlags[i]);
         }
 
         return result.toString();
     }
 
     /**
-     * If true, then print to PDF.
-     */
-    protected static boolean printPDF = false;
-
-    /**
      * If true, then auto exit after a few seconds.
      */
-    protected static boolean test = false;
+    private static boolean test = false;
 
     private static class WindowClosingAdapter extends WindowAdapter {
         @Override

@@ -1,7 +1,6 @@
 package plot.builder;
 
 import plot.model.Complex;
-import plot.model.Function;
 import plot.plotter.plot.Plot;
 
 public abstract class Builder {
@@ -12,7 +11,7 @@ public abstract class Builder {
         return new Plot[]{createRealPlot(functionPoints, complexPlot[0]), createImaginaryPlot(functionPoints, complexPlot[1])};
     }
 
-    protected Plot createImaginaryPlot(Complex[] functionPoints, Plot plot) {
+    private Plot createImaginaryPlot(Complex[] functionPoints, Plot plot) {
         boolean first = true;
 
         for (int i = 0; i < functionPoints.length; i++) {
@@ -23,7 +22,7 @@ public abstract class Builder {
         return plot;
     }
 
-    protected Plot createRealPlot(Complex[] functionPoints, Plot plot) {
+    private Plot createRealPlot(Complex[] functionPoints, Plot plot) {
         boolean first = true;
         for (int i = 0; i < functionPoints.length; i++) {
             for(int k = 0; k < 8; k++){
