@@ -1,4 +1,4 @@
-package untref.service;
+package core.service;
 
 import javafx.stage.FileChooser;
 
@@ -8,7 +8,6 @@ import java.util.List;
 public class FileIOService {
 
 	public List<File> openFiles(FileChooser fileChooser) {
-
 		return fileChooser.showOpenMultipleDialog(null);
 	}
 }
