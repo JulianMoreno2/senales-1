@@ -3,23 +3,19 @@ package core.service;
 import java.util.ArrayList;
 
 public class PulsationService {
-    private ArrayList<Double> arrayDatafileCsv;
-    private ArrayList<Double> ArrhythmiaPoint;
 
-    public PulsationService(ArrayList<Double> arrayDatafileCsv) {
-        this.arrayDatafileCsv = arrayDatafileCsv;
-    }
+    private ArrayList<Double> arrhythmiaPoint = new ArrayList<>();
 
-    public int getPulsationsQuantity() {
+    public int getPulsationsQuantity(ArrayList<Double> arrayDatafileCsv) {
         double threshold = 1.2;
         int firstPeak = 0;
         int secondPeak = 0;
 
-        for (int index = 1; index < this.arrayDatafileCsv.size() - 1; index++) {
+        for (int index = 1; index < arrayDatafileCsv.size() - 1; index++) {
 
-            if ((this.arrayDatafileCsv.get(index - 1) > this.arrayDatafileCsv.get(index))
-                    && (this.arrayDatafileCsv.get(index) > this.arrayDatafileCsv.get(index + 1))
-                    && (this.arrayDatafileCsv.get(index) > threshold)) {
+            if ((arrayDatafileCsv.get(index - 1) > arrayDatafileCsv.get(index))
+                    && (arrayDatafileCsv.get(index) > arrayDatafileCsv.get(index + 1))
+                    && (arrayDatafileCsv.get(index) > threshold)) {
                 if (firstPeak == 0) {
                     firstPeak = (index);
                 } else if (secondPeak == 0) {
@@ -31,28 +27,28 @@ public class PulsationService {
         return (int) (60 / period);
     }
 
-    public int getArrhythmiaQuantityPoint() {
+    public int getArrhythmiaQuantityPoint(ArrayList<Double> arrayDatafileCsv) {
         int count = 0;
         double threshold = 1.2;
         double thresholdArrhytmia = 0.3;
         int firstPeak = 0;
         int secondPeak = 0;
-        ArrhythmiaPoint = new ArrayList<Double>();
+        arrhythmiaPoint = new ArrayList<Double>();
 
-        for (int index = 1; index < this.arrayDatafileCsv.size() - 1; index++) {
+        for (int index = 1; index < arrayDatafileCsv.size() - 1; index++) {
 
-            if ((this.arrayDatafileCsv.get(index - 1) > this.arrayDatafileCsv.get(index))
-                    && (this.arrayDatafileCsv.get(index) > this.arrayDatafileCsv.get(index + 1))
-                    && (this.arrayDatafileCsv.get(index) > threshold)) {
+            if ((arrayDatafileCsv.get(index - 1) > arrayDatafileCsv.get(index))
+                    && (arrayDatafileCsv.get(index) > arrayDatafileCsv.get(index + 1))
+                    && (arrayDatafileCsv.get(index) > threshold)) {
                 if (firstPeak == 0) {
                     firstPeak = (index);
                 } else if (secondPeak == 0) {
                     secondPeak = (index);
                 }
             }
-            if ((this.arrayDatafileCsv.get(index) < thresholdArrhytmia)) {
+            if ((arrayDatafileCsv.get(index) < thresholdArrhytmia)) {
                 count++;
-                ArrhythmiaPoint.add(this.arrayDatafileCsv.get(index));
+                arrhythmiaPoint.add(arrayDatafileCsv.get(index));
             }
         }
 
@@ -60,7 +56,7 @@ public class PulsationService {
     }
 
     public ArrayList<Double> getArrhythmiaPoint() {
-        return ArrhythmiaPoint;
+        return arrhythmiaPoint;
     }
 
 }

@@ -1,4 +1,4 @@
-package plot.model;
+package core.model;
 /**************************************************************
  *  % java Complex
  *  a            = 5.0 + 6.0i

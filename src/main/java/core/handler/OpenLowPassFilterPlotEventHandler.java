@@ -2,8 +2,10 @@ package core.handler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
-import core.service.FileCsv;
+import core.provider.ProviderPlotterApp;
+import core.service.io.FileCsv;
 import core.service.filter.LowPassFilterService;
 import io.reactivex.subjects.PublishSubject;
 import javafx.event.ActionEvent;
@@ -25,10 +27,11 @@ public class OpenLowPassFilterPlotEventHandler implements EventHandler<ActionEve
 
         publishSubject.subscribe(fileCsvs -> {
 
-            PlotterApp plotterApp = new PlotterApp(fileCsvs);
+            ArrayList<Double> data = fileCsvs.stream().findFirst().get().getArrayListDataFileCsv();
+            //TODO: apply lowPassFilterService to signal points
 
             try {
-                plotterApp.startLowPassFilterPlot(new PlotBuilder(), lowPassFilterService);
+                ProviderPlotterApp.provide().startLowPassFilterPlot(data);
             } catch (IOException e) {
                 e.printStackTrace();
             }

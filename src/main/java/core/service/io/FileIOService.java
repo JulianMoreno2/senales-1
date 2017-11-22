@@ -1,4 +1,4 @@
-package core.service;
+package core.service.io;
 
 import javafx.stage.FileChooser;
 

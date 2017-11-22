@@ -15,8 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import core.service.FileCsv;
-import core.service.FileIOService;
+import core.service.io.FileCsv;
+import core.service.io.FileIOService;
 
 public class OpenFilesEventHandler implements EventHandler<ActionEvent> {
 

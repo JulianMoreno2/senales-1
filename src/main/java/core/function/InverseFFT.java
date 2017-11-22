@@ -1,6 +1,6 @@
-package plot.function;
+package core.function;
 
-import plot.model.Complex;
+import core.model.Complex;
 
 class InverseFFT {
 
@@ -27,6 +27,5 @@ class InverseFFT {
         }
 
         return y;
-
     }
 }

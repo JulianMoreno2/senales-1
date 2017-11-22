@@ -1,7 +1,7 @@
 package plot.plotter.plot;
 
 import plot.builder.Builder;
-import plot.model.Complex;
+import core.model.Complex;
 
 import java.util.ArrayList;
 

@@ -1,43 +1,31 @@
 package plot;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.swing.*;
-
-import core.service.FileCsv;
-import core.service.PulsationService;
-import core.service.filter.LowPassFilterService;
 import plot.plotter.plot.Plot;
 import plot.plotter.plot.PlotApplication;
 import plot.plotter.plot.PlotBuilder;
 
+import javax.swing.*;
+import java.io.IOException;
+import java.util.ArrayList;
+
 public class PlotterApp {
 
-    private final ArrayList<FileCsv> arrayfileCsv;
+    private PlotBuilder plotBuilder;
 
-    public PlotterApp(ArrayList<FileCsv> arrayfileCsv) {
-        this.arrayfileCsv = arrayfileCsv;
+    public PlotterApp(PlotBuilder plotBuilder) {
+        this.plotBuilder = plotBuilder;
     }
 
-    public void startPulsationPlot(PlotBuilder plotBuilder) throws IOException {
+    public void startPulsationPlot(ArrayList<Double> points, Integer quantityPulsation, Integer arrhythmiaQuantityPoint) throws IOException {
 
-        FileCsv fileCsv = arrayfileCsv.stream().findFirst().get();
-        Plot[] plotCsvFile = getPulsationCsvPoints(plotBuilder, fileCsv.getArrayListDataFileCsv());
+        Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Pulsations per minute:"
+                + String.valueOf(quantityPulsation + "  ArrhythmiaQuantityPoint: "
+                + String.valueOf(arrhythmiaQuantityPoint)));
 
         SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }
 
-    private Plot[] getPulsationCsvPoints(PlotBuilder plotBuilder, ArrayList<Double> points) {
-        PulsationService pulsations = new PulsationService(points);
-        int quantityPulsation = pulsations.getPulsationsQuantity();
-        return plotBuilder
-                .buildPlotFromCsv(points, "Pulsations per minute:"
-                        + String.valueOf(quantityPulsation + "  ArrhythmiaQuantityPoint: "
-                        + String.valueOf(pulsations.getArrhythmiaQuantityPoint())));
-    }
-
-    public void startLowPassFilterPlot(PlotBuilder plotBuilder, LowPassFilterService lowPassFilterService)  throws IOException {
-
+    public void startLowPassFilterPlot(ArrayList<Double> data) throws IOException {
+        //TODO: Build a Plot for data
     }
 }

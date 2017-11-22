@@ -1,6 +1,6 @@
 package plot.builder;
 
-import plot.model.Complex;
+import core.model.Complex;
 import plot.plotter.plot.Plot;
 
 public abstract class Builder {

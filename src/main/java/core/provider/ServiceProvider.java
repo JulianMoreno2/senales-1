@@ -1,7 +1,7 @@
 package core.provider;
 
 import javafx.stage.FileChooser;
-import core.service.FileIOService;
+import core.service.io.FileIOService;
 
 class ServiceProvider {
 

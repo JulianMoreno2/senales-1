@@ -2,19 +2,22 @@ package core.handler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
+import core.provider.ProviderPlotterApp;
+import core.service.PulsationService;
 import io.reactivex.subjects.PublishSubject;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import core.service.FileCsv;
-import plot.PlotterApp;
-import plot.plotter.plot.PlotBuilder;
+import core.service.io.FileCsv;
 
 public class OpenPulsationPlotEventHandler implements EventHandler<ActionEvent> {
 
+	private PulsationService pulsationService;
 	private PublishSubject<ArrayList<FileCsv>> publishSubject;
 
-	public OpenPulsationPlotEventHandler(PublishSubject<ArrayList<FileCsv>> publishSubject) {
+	public OpenPulsationPlotEventHandler(PulsationService pulsationService, PublishSubject<ArrayList<FileCsv>> publishSubject) {
+		this.pulsationService = pulsationService;
 		this.publishSubject = publishSubject;
 	}
 
@@ -22,10 +25,12 @@ public class OpenPulsationPlotEventHandler implements EventHandler<ActionEvent> 
 
 		publishSubject.subscribe(fileCsvs -> {
 
-			PlotterApp plotterApp = new PlotterApp(fileCsvs);
+            ArrayList<Double> data = fileCsvs.stream().findFirst().get().getArrayListDataFileCsv();
+            int pulsationsQuantity = pulsationService.getPulsationsQuantity(data);
+            int arrhythmiaQuantityPoint = pulsationService.getArrhythmiaQuantityPoint(data);
 
-			try {
-				plotterApp.startPulsationPlot(new PlotBuilder());
+            try {
+				ProviderPlotterApp.provide().startPulsationPlot(data, pulsationsQuantity, arrhythmiaQuantityPoint);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
