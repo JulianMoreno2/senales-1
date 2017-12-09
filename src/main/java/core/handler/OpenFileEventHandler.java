@@ -18,13 +18,13 @@ import javafx.stage.Stage;
 import core.service.io.FileCsv;
 import core.service.io.FileIOService;
 
-public class OpenFilesEventHandler implements EventHandler<ActionEvent> {
+public class OpenFileEventHandler implements EventHandler<ActionEvent> {
 
     private FileChooser fileChooser;
     private FileIOService fileIOService;
     private PublishSubject<ArrayList<FileCsv>> publishSubject;
 
-    public OpenFilesEventHandler(FileChooser fileChooser, FileIOService fileIOService,
+    public OpenFileEventHandler(FileChooser fileChooser, FileIOService fileIOService,
             PublishSubject<ArrayList<FileCsv>> publishSubject) {
         this.fileChooser = fileChooser;
         this.fileIOService = fileIOService;

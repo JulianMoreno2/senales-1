@@ -1,9 +1,12 @@
 package core.provider;
 
 import javafx.stage.FileChooser;
+import core.handler.OpenLowPassFilterPlotEventHandler;
+import core.service.PulsationService;
+import core.service.filter.LowPassFilterService;
 import core.service.io.FileIOService;
 
-class ServiceProvider {
+public class ServiceProvider {
 
     public static FileChooser provideFileChooser(String title) {
         final FileChooser fileChooser = new FileChooser();
@@ -15,5 +18,13 @@ class ServiceProvider {
 
     public static FileIOService provideIOService() {
         return new FileIOService();
+    }
+    
+    public static LowPassFilterService provideLowPassFilterService() {
+    	return new LowPassFilterService();
+    }
+    
+    public static PulsationService providePulsationService() {
+    	return new PulsationService();
     }
 }

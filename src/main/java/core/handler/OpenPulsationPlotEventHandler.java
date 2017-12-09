@@ -24,7 +24,6 @@ public class OpenPulsationPlotEventHandler implements EventHandler<ActionEvent> 
 	public void handle(ActionEvent event) {
 
 		publishSubject.subscribe(fileCsvs -> {
-
             ArrayList<Double> data = fileCsvs.stream().findFirst().get().getArrayListDataFileCsv();
             int pulsationsQuantity = pulsationService.getPulsationsQuantity(data);
             int arrhythmiaQuantityPoint = pulsationService.getArrhythmiaQuantityPoint(data);

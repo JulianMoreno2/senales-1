@@ -17,21 +17,25 @@ public class OpenLowPassFilterPlotEventHandler implements EventHandler<ActionEve
 
     private LowPassFilterService lowPassFilterService;
     private PublishSubject<ArrayList<FileCsv>> publishSubject;
+	private Integer frecuency;
+	private Integer order;
 
-    public OpenLowPassFilterPlotEventHandler(LowPassFilterService lowPassFilterService, PublishSubject<ArrayList<FileCsv>> publishSubject) {
+    public OpenLowPassFilterPlotEventHandler(LowPassFilterService lowPassFilterService, PublishSubject<ArrayList<FileCsv>> publishSubject, Integer frecuency, Integer order) {
         this.lowPassFilterService = lowPassFilterService;
         this.publishSubject = publishSubject;
+        this.frecuency = frecuency;
+        this.order = order;
     }
 
     public void handle(ActionEvent event) {
 
-        publishSubject.subscribe(fileCsvs -> {
+        this.publishSubject.subscribe(fileCsvs -> {
 
             ArrayList<Double> data = fileCsvs.stream().findFirst().get().getArrayListDataFileCsv();
-            //TODO: apply lowPassFilterService to signal points
+			ArrayList<Double> points = this.lowPassFilterService.apply(data, this.frecuency, this.order);
 
             try {
-                ProviderPlotterApp.provide().startLowPassFilterPlot(data);
+                ProviderPlotterApp.provide().startLowPassFilterPlot(points);
             } catch (IOException e) {
                 e.printStackTrace();
             }
