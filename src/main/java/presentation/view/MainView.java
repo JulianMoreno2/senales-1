@@ -24,13 +24,10 @@ public class MainView extends Application implements MainPresenter.View {
         Scene scene = new Scene(borderPane, 400, 200, Color.WHITE);
 
         MainPresenter mainPresenter = PresenterProvider.provideMainPresenter();
-        MenuBar menuBar = new MenuBarBuilder(mainPresenter.onClickOpenFile()).build();
 
         TilePane tilePane = createButtonTile(mainPresenter);
 
-        borderPane.setTop(menuBar);
         borderPane.setCenter(tilePane);
-
         primaryStage.setTitle("Procesamiento de Senales II");
         primaryStage.setScene(scene);
         primaryStage.show();

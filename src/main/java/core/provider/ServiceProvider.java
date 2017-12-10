@@ -5,6 +5,7 @@ import core.handler.OpenLowPassFilterPlotEventHandler;
 import core.service.PulsationService;
 import core.service.filter.LowPassFilterService;
 import core.service.io.FileIOService;
+import core.service.io.OpenFileService;
 
 public class ServiceProvider {
 
@@ -26,5 +27,10 @@ public class ServiceProvider {
     
     public static PulsationService providePulsationService() {
     	return new PulsationService();
+    }
+    
+    public static OpenFileService provideOpenFileService() {
+    	return new OpenFileService(provideFileChooser("Open File"), provideIOService(), 
+    			UtilProvider.provideOpenFilePublishSubject());
     }
 }

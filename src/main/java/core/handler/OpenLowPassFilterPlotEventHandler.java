@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import core.provider.ProviderPlotterApp;
+import core.provider.PlotterAppProvider;
 import core.service.io.FileCsv;
 import core.service.filter.LowPassFilterService;
 import io.reactivex.subjects.PublishSubject;
@@ -35,7 +35,7 @@ public class OpenLowPassFilterPlotEventHandler implements EventHandler<ActionEve
 			ArrayList<Double> points = this.lowPassFilterService.apply(data, this.frecuency, this.order);
 
             try {
-                ProviderPlotterApp.provide().startLowPassFilterPlot(points);
+                PlotterAppProvider.provide().startLowPassFilterPlot(points);
             } catch (IOException e) {
                 e.printStackTrace();
             }
