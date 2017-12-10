@@ -28,7 +28,7 @@ public class MainPresenter extends Presenter<View> {
     }
 
     public EventHandler<ActionEvent> onClickOpenLowPassFilterPlot(Integer frecuency, Integer order) {
-        return new OpenLowPassFilterPlotEventHandler(provideLowPassFilterService(), fileCsvPublishSubject, frecuency, order);
+        return new OpenLowPassFilterPlotEventHandler(provideOpenFileService(), provideLowPassFilterService(), fileCsvPublishSubject, frecuency, order);
     }
 
     public interface View extends Presenter.View {

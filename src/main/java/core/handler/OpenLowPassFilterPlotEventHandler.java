@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 import core.provider.PlotterAppProvider;
 import core.service.io.FileCsv;
+import core.service.io.OpenFileService;
 import core.service.filter.LowPassFilterService;
 import io.reactivex.subjects.PublishSubject;
 import javafx.event.ActionEvent;
@@ -15,12 +16,14 @@ import plot.plotter.plot.PlotBuilder;
 
 public class OpenLowPassFilterPlotEventHandler implements EventHandler<ActionEvent> {
 
+	private OpenFileService openFileService;
     private LowPassFilterService lowPassFilterService;
     private PublishSubject<ArrayList<FileCsv>> publishSubject;
 	private Integer frecuency;
 	private Integer order;
 
-    public OpenLowPassFilterPlotEventHandler(LowPassFilterService lowPassFilterService, PublishSubject<ArrayList<FileCsv>> publishSubject, Integer frecuency, Integer order) {
+    public OpenLowPassFilterPlotEventHandler(OpenFileService openFileService, LowPassFilterService lowPassFilterService, PublishSubject<ArrayList<FileCsv>> publishSubject, Integer frecuency, Integer order) {
+    	this.openFileService = openFileService;
         this.lowPassFilterService = lowPassFilterService;
         this.publishSubject = publishSubject;
         this.frecuency = frecuency;
@@ -40,6 +43,7 @@ public class OpenLowPassFilterPlotEventHandler implements EventHandler<ActionEve
                 e.printStackTrace();
             }
         });
-
+        
+        this.openFileService.openFile();
     }
 }
