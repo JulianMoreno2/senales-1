@@ -1,11 +1,11 @@
 package plot.plotter.plot;
 
-import plot.builder.Builder;
 import core.model.Complex;
+import plot.builder.Builder;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class PlotBuilder extends Builder{
+public class PlotBuilder extends Builder {
 
     private Plot buildPlotContext(String title) {
 
@@ -40,10 +40,10 @@ public class PlotBuilder extends Builder{
         return buildPlotFunction(functionPoints, new Plot[]{realPlot, imaginaryPlot});
     }
 
-    public Plot[] buildPlotFromCsv(ArrayList<Double> csvFilePoints,String name) {
+    public Plot[] buildPlotFromCsv(List<Double> csvFilePoints, String name) {
         Complex[] functionPoints = new Complex[csvFilePoints.size()];
 
-        for(int i = 0; i < functionPoints.length; i++){
+        for (int i = 0; i < functionPoints.length; i++) {
             functionPoints[i] = new Complex(csvFilePoints.get(i), 0);
         }
 

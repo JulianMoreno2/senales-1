@@ -1,12 +1,11 @@
-package core.service;
+package core.service.pulsation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PulsationService {
 
-    private ArrayList<Double> arrhythmiaPoint = new ArrayList<>();
-
-    public int getPulsationsQuantity(ArrayList<Double> arrayDatafileCsv) {
+    public int getPulsationsQuantity(List<Double> arrayDatafileCsv) {
         double threshold = 1.2;
         int firstPeak = 0;
         int secondPeak = 0;
@@ -27,13 +26,13 @@ public class PulsationService {
         return (int) (60 / period);
     }
 
-    public int getArrhythmiaQuantityPoint(ArrayList<Double> arrayDatafileCsv) {
+    public int getArrhythmiaQuantityPoint(List<Double> arrayDatafileCsv) {
         int count = 0;
         double threshold = 1.2;
         double thresholdArrhytmia = 0.3;
         int firstPeak = 0;
         int secondPeak = 0;
-        arrhythmiaPoint = new ArrayList<Double>();
+        ArrayList<Double> arrhythmiaPoint = new ArrayList<>();
 
         for (int index = 1; index < arrayDatafileCsv.size() - 1; index++) {
 
@@ -54,9 +53,4 @@ public class PulsationService {
 
         return count;
     }
-
-    public ArrayList<Double> getArrhythmiaPoint() {
-        return arrhythmiaPoint;
-    }
-
 }
