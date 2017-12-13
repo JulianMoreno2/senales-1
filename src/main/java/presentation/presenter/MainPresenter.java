@@ -1,43 +1,68 @@
 package presentation.presenter;
 
-import java.util.ArrayList;
-
-import core.handler.OpenLowPassFilterPlotEventHandler;
-import core.service.PulsationService;
-import core.service.filter.LowPassFilterService;
-import io.reactivex.subjects.PublishSubject;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.stage.FileChooser;
+import core.action.GetFileCsvPointsAction;
+import core.action.LowPassFilterPlotAction;
+import core.action.PulsationPlotAction;
+import core.action.GetSignalFrecuencyAction;
+import core.service.io.OpenFileService;
 import presentation.presenter.Presenter.View;
-import core.handler.OpenFilesEventHandler;
-import core.handler.OpenPulsationPlotEventHandler;
-import core.service.io.FileCsv;
-import core.service.io.FileIOService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainPresenter extends Presenter<View> {
 
-    private FileChooser fileChooser;
-    private FileIOService fileIOService;
-    private PublishSubject<ArrayList<FileCsv>> fileCsvPublishSubject;
+    private final PulsationPlotAction pulsationPlotAction;
+    private final LowPassFilterPlotAction lowPassFilterPlotAction;
+    private final GetSignalFrecuencyAction getSignalFrecuencyAction;
+    private GetFileCsvPointsAction getFileCsvPointsAction;
 
-    public MainPresenter(FileChooser fileChooser, FileIOService fileIOService,
-                         PublishSubject<ArrayList<FileCsv>> fileCsvPublishSubject) {
-        this.fileChooser = fileChooser;
-        this.fileIOService = fileIOService;
-        this.fileCsvPublishSubject = fileCsvPublishSubject;
+    public MainPresenter(GetFileCsvPointsAction getFileCsvPointsAction,
+                         PulsationPlotAction pulsationPlotAction,
+                         LowPassFilterPlotAction lowPassFilterPlotAction,
+                         GetSignalFrecuencyAction getSignalFrecuencyAction) {
+
+        this.getFileCsvPointsAction = getFileCsvPointsAction;
+        this.pulsationPlotAction = pulsationPlotAction;
+        this.lowPassFilterPlotAction = lowPassFilterPlotAction;
+        this.getSignalFrecuencyAction = getSignalFrecuencyAction;
     }
 
-    public EventHandler<ActionEvent> onClickOpenFile() {
-        return new OpenFilesEventHandler(fileChooser, fileIOService, fileCsvPublishSubject);
+    public void onClickOpenPulsationPlot() {
+        pulsationPlotAction.execute(loadFileAsList());
     }
 
-    public EventHandler<ActionEvent> onClickOpenPulsationPlot() {
-        return new OpenPulsationPlotEventHandler(new PulsationService(), fileCsvPublishSubject);
+    public void onClickLowPassFilterApply(Integer frecuency, Integer order) {
+        lowPassFilterPlotAction.execute(loadFileAsMap(), frecuency, order);
     }
 
-    public EventHandler<ActionEvent> onClickOpenLowPassFilterPlot() {
-        return new OpenLowPassFilterPlotEventHandler(new LowPassFilterService(), fileCsvPublishSubject);
+    public String onClickLowPassFilterPlot() {
+        return getSignalFrecuencyAction.execute(loadFileAsMap());
+    }
+
+    private Map<String, String> loadFileAsMap() {
+
+        try {
+            return getFileCsvPointsAction.getStringArrayListDataFileCsv();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new HashMap<>();
+    }
+
+    private List<Double> loadFileAsList() {
+
+        try {
+            return getFileCsvPointsAction.<Double>getArrayListDataFileCsv();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
     }
 
     public interface View extends Presenter.View {

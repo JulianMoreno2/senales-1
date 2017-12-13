@@ -3,9 +3,12 @@ package presentation.view;
 import core.provider.PresenterProvider;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -13,34 +16,83 @@ import presentation.presenter.MainPresenter;
 
 public class MainView extends Application implements MainPresenter.View {
 
+    private boolean lowPassFilterIsActive = true;
+
     @Override
     public void start(Stage primaryStage) {
         BorderPane borderPane = new BorderPane();
         Scene scene = new Scene(borderPane, 400, 200, Color.WHITE);
 
         MainPresenter mainPresenter = PresenterProvider.provideMainPresenter();
-        MenuBar menuBar = new MenuBarBuilder(mainPresenter.onClickOpenFile()).build();
 
-        TilePane tilePane = createButtonTile(mainPresenter);
+        HBox hBox = createHBox(mainPresenter);
 
-        borderPane.setTop(menuBar);
-        borderPane.setCenter(tilePane);
-
+        borderPane.setCenter(hBox);
         primaryStage.setTitle("Procesamiento de Senales II");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private TilePane createButtonTile(MainPresenter mainPresenter) {
-        ToggleButton togglePulsationPlotButton = new ToggleButton("Pulsation Plot");
-        togglePulsationPlotButton.setOnAction(mainPresenter.onClickOpenPulsationPlot());
+    private HBox createHBox(MainPresenter mainPresenter) {
 
-        ToggleButton toggleLowPassFilterButton = new ToggleButton("Low Pass Filter Plot");
-        toggleLowPassFilterButton.setOnAction(mainPresenter.onClickOpenLowPassFilterPlot());
+        TilePane pulsationTilePane = createPulsationPlotTilePane(mainPresenter);
+        TilePane lowPassTilePane = createLowPassFilterTilePane(mainPresenter);
 
-        TilePane tilePane = new TilePane();
-        tilePane.getChildren().addAll(togglePulsationPlotButton, toggleLowPassFilterButton);
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(pulsationTilePane, lowPassTilePane);
 
-        return tilePane;
+        return hBox;
+    }
+
+    private TilePane createPulsationPlotTilePane(MainPresenter mainPresenter) {
+
+        ToggleButton pulsationPlotToggleButton = new ToggleButton("Pulsation Plot");
+        pulsationPlotToggleButton.setOnAction(event -> mainPresenter.onClickOpenPulsationPlot());
+        TilePane pulsationTilePane = new TilePane();
+        pulsationTilePane.getChildren().add(pulsationPlotToggleButton);
+
+        return pulsationTilePane;
+    }
+
+    private TilePane createLowPassFilterTilePane(MainPresenter mainPresenter) {
+
+        Label frecuencyLabel = new Label("Frecuency");
+        TextField frecuencyTextField = new TextField();
+        frecuencyTextField.setDisable(lowPassFilterIsActive);
+        frecuencyTextField.appendText("0");
+
+        Label orderLabel = new Label("Order");
+        TextField orderTextField = new TextField();
+        orderTextField.setDisable(lowPassFilterIsActive);
+        orderTextField.appendText("0");
+
+        ToggleButton lowPassFilterToggleButton = new ToggleButton("Low Pass Filter Plot");
+        Button lowPassFilterButton = new Button("Apply");
+        lowPassFilterButton.setDisable(lowPassFilterIsActive);
+
+        lowPassFilterToggleButton.setOnAction(event -> {
+            frecuencyTextField.appendText(mainPresenter.onClickLowPassFilterPlot());
+            lowPassFilterButton.setDisable(!lowPassFilterIsActive);
+            orderTextField.setDisable(!lowPassFilterIsActive);
+            lowPassFilterIsActive = !lowPassFilterIsActive;
+        });
+
+        lowPassFilterButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply(
+                Integer.getInteger(frecuencyTextField.getText()),
+                Integer.getInteger(orderTextField.getText())));
+
+        TilePane lowPassFilterTilePane = new TilePane();
+        lowPassFilterTilePane.getChildren().addAll(lowPassFilterToggleButton, lowPassFilterButton);
+
+        TilePane frecuencyTilePane = new TilePane();
+        frecuencyTilePane.getChildren().addAll(frecuencyLabel, frecuencyTextField);
+
+        TilePane orderTilePane = new TilePane();
+        orderTilePane.getChildren().addAll(orderLabel, orderTextField);
+
+        TilePane lowPassTilePane = new TilePane();
+        lowPassTilePane.getChildren().addAll(lowPassFilterTilePane, frecuencyTilePane, orderTilePane);
+
+        return lowPassTilePane;
     }
 }

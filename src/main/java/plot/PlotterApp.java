@@ -7,6 +7,7 @@ import plot.plotter.plot.PlotBuilder;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlotterApp {
 
@@ -16,7 +17,9 @@ public class PlotterApp {
         this.plotBuilder = plotBuilder;
     }
 
-    public void startPulsationPlot(ArrayList<Double> points, Integer quantityPulsation, Integer arrhythmiaQuantityPoint) throws IOException {
+    public void startPulsationPlot(List<Double> points,
+                                   Integer quantityPulsation,
+                                   Integer arrhythmiaQuantityPoint) throws IOException {
 
         Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Pulsations per minute:"
                 + String.valueOf(quantityPulsation + "  ArrhythmiaQuantityPoint: "
@@ -25,7 +28,9 @@ public class PlotterApp {
         SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }
 
-    public void startLowPassFilterPlot(ArrayList<Double> data) throws IOException {
-        //TODO: Build a Plot for data
+    public void startLowPassFilterPlot(ArrayList<Double> points) throws IOException {
+    	Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Low Pass Filter");
+
+        SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }
 }

@@ -1,7 +1,5 @@
 package plot.plotter.util;
 
-import com.sun.applet2.preloader.CancelException;
-
 class MessageHandler {
 
     public static void error(String info, Throwable throwable) {
@@ -31,10 +29,6 @@ class MessageHandler {
     }
 
     private void _error(String info, Throwable throwable) {
-        if (throwable instanceof CancelException) {
-            return;
-        }
-
         System.err.println(info);
         throwable.printStackTrace();
     }
