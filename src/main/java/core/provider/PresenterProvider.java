@@ -9,7 +9,8 @@ public class PresenterProvider {
                 ActionProvider.provideGetFileCsvPointsAction(),
                 ActionProvider.providePulsationPlotAction(),
                 ActionProvider.provideLowPassFilterPlotAction(),
-                ActionProvider.provideGetSignalFrecuencyAction()
+                ActionProvider.provideGetSignalFrecuencyAction(),
+                ActionProvider.provideSaveFilterAction()
         );
     }
 }

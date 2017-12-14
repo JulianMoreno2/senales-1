@@ -2,6 +2,7 @@ package presentation.view;
 
 import core.provider.PresenterProvider;
 import javafx.application.Application;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -21,7 +22,7 @@ public class MainView extends Application implements MainPresenter.View {
     @Override
     public void start(Stage primaryStage) {
         BorderPane borderPane = new BorderPane();
-        Scene scene = new Scene(borderPane, 400, 200, Color.WHITE);
+        Scene scene = new Scene(borderPane, 600, 200, Color.WHITE);
 
         MainPresenter mainPresenter = PresenterProvider.provideMainPresenter();
 
@@ -67,22 +68,28 @@ public class MainView extends Application implements MainPresenter.View {
         orderTextField.appendText("0");
 
         ToggleButton lowPassFilterToggleButton = new ToggleButton("Low Pass Filter Plot");
-        Button lowPassFilterButton = new Button("Apply");
-        lowPassFilterButton.setDisable(lowPassFilterIsActive);
+        Button lowPassFilterApplyButton = new Button("Apply");
+        lowPassFilterApplyButton.setDisable(lowPassFilterIsActive);
+        
+        Button plotSignalButton = new Button("Plot Signal");
+        plotSignalButton.setOnAction(event -> {
+        	mainPresenter.onClickPlotSignal();
+        });
 
         lowPassFilterToggleButton.setOnAction(event -> {
-            frecuencyTextField.appendText(mainPresenter.onClickLowPassFilterPlot());
-            lowPassFilterButton.setDisable(!lowPassFilterIsActive);
+        	mainPresenter.onClickLowPassFilterPlot();
+            lowPassFilterApplyButton.setDisable(!lowPassFilterIsActive);
             orderTextField.setDisable(!lowPassFilterIsActive);
             lowPassFilterIsActive = !lowPassFilterIsActive;
         });
 
-        lowPassFilterButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply(
+        lowPassFilterApplyButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply(
                 Integer.getInteger(frecuencyTextField.getText()),
                 Integer.getInteger(orderTextField.getText())));
 
         TilePane lowPassFilterTilePane = new TilePane();
-        lowPassFilterTilePane.getChildren().addAll(lowPassFilterToggleButton, lowPassFilterButton);
+        
+		lowPassFilterTilePane.getChildren().addAll(lowPassFilterToggleButton, lowPassFilterApplyButton, plotSignalButton);
 
         TilePane frecuencyTilePane = new TilePane();
         frecuencyTilePane.getChildren().addAll(frecuencyLabel, frecuencyTextField);

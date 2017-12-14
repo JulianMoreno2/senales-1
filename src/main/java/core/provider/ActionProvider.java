@@ -4,6 +4,7 @@ import core.action.GetFileCsvPointsAction;
 import core.action.GetSignalFrecuencyAction;
 import core.action.LowPassFilterPlotAction;
 import core.action.PulsationPlotAction;
+import core.action.SaveFilterAction;
 
 public class ActionProvider {
 
@@ -12,7 +13,8 @@ public class ActionProvider {
     }
 
     public static LowPassFilterPlotAction provideLowPassFilterPlotAction() {
-        return new LowPassFilterPlotAction(ServiceProvider.provideLowPassFilterService());
+        return new LowPassFilterPlotAction(ServiceProvider.provideLowPassFilterService(),
+        		RepositoryProvider.provideFilterRepository());
     }
 
     public static GetSignalFrecuencyAction provideGetSignalFrecuencyAction() {
@@ -22,4 +24,8 @@ public class ActionProvider {
     public static GetFileCsvPointsAction provideGetFileCsvPointsAction() {
         return new GetFileCsvPointsAction(ServiceProvider.provideOpenFileService());
     }
+
+	public static SaveFilterAction provideSaveFilterAction() {
+		return new SaveFilterAction(RepositoryProvider.provideFilterRepository());
+	}
 }

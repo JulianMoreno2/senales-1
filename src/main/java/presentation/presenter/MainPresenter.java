@@ -3,8 +3,10 @@ package presentation.presenter;
 import core.action.GetFileCsvPointsAction;
 import core.action.LowPassFilterPlotAction;
 import core.action.PulsationPlotAction;
+import core.action.SaveFilterAction;
 import core.action.GetSignalFrecuencyAction;
 import core.service.io.OpenFileService;
+import core.util.FilterKeys;
 import presentation.presenter.Presenter.View;
 
 import java.io.IOException;
@@ -12,23 +14,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MainPresenter extends Presenter<View> {
 
-    private final PulsationPlotAction pulsationPlotAction;
+	private final PulsationPlotAction pulsationPlotAction;
     private final LowPassFilterPlotAction lowPassFilterPlotAction;
     private final GetSignalFrecuencyAction getSignalFrecuencyAction;
-    private GetFileCsvPointsAction getFileCsvPointsAction;
+    private final GetFileCsvPointsAction getFileCsvPointsAction;
+	private final SaveFilterAction saveFilterAction;
 
     public MainPresenter(GetFileCsvPointsAction getFileCsvPointsAction,
                          PulsationPlotAction pulsationPlotAction,
                          LowPassFilterPlotAction lowPassFilterPlotAction,
-                         GetSignalFrecuencyAction getSignalFrecuencyAction) {
+                         GetSignalFrecuencyAction getSignalFrecuencyAction,
+                         SaveFilterAction saveFilterAction) {
 
         this.getFileCsvPointsAction = getFileCsvPointsAction;
         this.pulsationPlotAction = pulsationPlotAction;
         this.lowPassFilterPlotAction = lowPassFilterPlotAction;
         this.getSignalFrecuencyAction = getSignalFrecuencyAction;
+        this.saveFilterAction = saveFilterAction;
     }
 
     public void onClickOpenPulsationPlot() {
@@ -36,22 +42,43 @@ public class MainPresenter extends Presenter<View> {
     }
 
     public void onClickLowPassFilterApply(Integer frecuency, Integer order) {
-        lowPassFilterPlotAction.execute(loadFileAsMap(), frecuency, order);
+        lowPassFilterPlotAction.execute(loadNewFile(), frecuency, order);
     }
 
-    public String onClickLowPassFilterPlot() {
-        return getSignalFrecuencyAction.execute(loadFileAsMap());
+    public void onClickLowPassFilterPlot() {
+    	saveFilterAction.execute(FilterKeys.LOW_PASS_FILTER, loadFilterFile());
     }
 
-    private Map<String, String> loadFileAsMap() {
+    public void onClickPlotSignal() {
+    	pulsationPlotAction.execute(loadNewFile());	
+    }
 
-        try {
-            return getFileCsvPointsAction.getStringArrayListDataFileCsv();
+    private List<Double> loadFilterFile() {
+    	try {
+            return getFileCsvPointsAction.getFilterDataFileCsv();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new HashMap<>();
+        return new ArrayList<>();
+	}
+
+	private List<Double> loadNewFile() {
+
+        try {
+            Map<String, String> map = getFileCsvPointsAction.getDataFileCsvAsMap();
+            
+            List<Map.Entry<String, String>> entries = new ArrayList<>(map.entrySet());
+            return entries.subList(2, entries.size()).stream()
+                    .map(Map.Entry::getValue)
+                    .map(Double::parseDouble)
+                    .collect(Collectors.toList());
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>();
     }
 
     private List<Double> loadFileAsList() {
@@ -68,4 +95,5 @@ public class MainPresenter extends Presenter<View> {
     public interface View extends Presenter.View {
 
     }
+
 }

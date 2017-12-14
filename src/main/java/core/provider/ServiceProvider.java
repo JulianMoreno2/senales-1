@@ -17,7 +17,7 @@ public class ServiceProvider {
     }
 
     public static LowPassFilterService provideLowPassFilterService() {
-    	return new LowPassFilterService();
+    	return new LowPassFilterService(FunctionProvider.provideLinearConvolve());
     }
     
     public static PulsationService providePulsationService() {

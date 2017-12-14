@@ -2,7 +2,7 @@ package core.function;
 
 import core.model.Complex;
 
-class LinearConvolve {
+public class LinearConvolve {
 
     // compute the linear convolution of x and y
     public static Complex[] build(Complex[] x, Complex[] y) {

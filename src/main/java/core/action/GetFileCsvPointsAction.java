@@ -44,7 +44,7 @@ public class GetFileCsvPointsAction {
         return arrayDatafileCsv;
     }
 
-    public Map<String, String> getStringArrayListDataFileCsv() throws IOException {
+    public Map<String, String> getDataFileCsvAsMap() throws IOException {
 
         String path = getFilePath();
 
@@ -70,8 +70,47 @@ public class GetFileCsvPointsAction {
         return dataFile;
     }
 
+    /*
+     * Fixme: Borrar los espacios del final 
+     * del archivo del filtro exportado de matlab
+     */
+    public List<Double> getFilterDataFileCsv() throws IOException {
+    	
+    	String path = getFilePath();
+
+        String registry;
+        BufferedReader buffer = null;
+        ArrayList<Double> data = new ArrayList<>();
+
+        try {
+
+            buffer = new BufferedReader(new FileReader(path));
+            boolean isValidRow = false;
+            
+            while ((registry = buffer.readLine()) != null) {
+            	
+            	if(registry.contains("Numerator")) {
+            		isValidRow = true;
+            		continue;
+            	}
+            	
+            	if(isValidRow && registry != "") {
+            		data.add(Double.parseDouble(registry));
+            	}                
+            }
+
+            buffer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        data.trimToSize();
+        return data;
+    }
+    
     private String getFilePath() {
         return openFileService.openFile().getAbsolutePath();
     }
+
 
 }
