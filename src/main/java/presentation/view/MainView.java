@@ -2,15 +2,11 @@ package presentation.view;
 
 import core.provider.PresenterProvider;
 import javafx.application.Application;
-import javafx.scene.Node;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.TilePane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import presentation.presenter.MainPresenter;
@@ -26,23 +22,29 @@ public class MainView extends Application implements MainPresenter.View {
 
         MainPresenter mainPresenter = PresenterProvider.provideMainPresenter();
 
-        HBox hBox = createHBox(mainPresenter);
+        FlowPane flowPane = createHBox(mainPresenter);
 
-        borderPane.setCenter(hBox);
+        borderPane.setCenter(flowPane);
         primaryStage.setTitle("Procesamiento de Senales II");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private HBox createHBox(MainPresenter mainPresenter) {
+    private FlowPane createHBox(MainPresenter mainPresenter) {
 
         TilePane pulsationTilePane = createPulsationPlotTilePane(mainPresenter);
         TilePane lowPassTilePane = createLowPassFilterTilePane(mainPresenter);
+        TilePane createPlotSignalTilePane = createPlotSignalTilePane(mainPresenter);
 
-        HBox hBox = new HBox();
-        hBox.getChildren().addAll(pulsationTilePane, lowPassTilePane);
+        FlowPane flowPane = new FlowPane();
+        flowPane.setPadding(new Insets(10, 10, 10, 10));
+        flowPane.setVgap(10);
+        flowPane.setHgap(5);
+        flowPane.setPrefWrapLength(200);
 
-        return hBox;
+        flowPane.getChildren().addAll(pulsationTilePane, lowPassTilePane, createPlotSignalTilePane);
+
+        return flowPane;
     }
 
     private TilePane createPulsationPlotTilePane(MainPresenter mainPresenter) {
@@ -50,6 +52,8 @@ public class MainView extends Application implements MainPresenter.View {
         ToggleButton pulsationPlotToggleButton = new ToggleButton("Pulsation Plot");
         pulsationPlotToggleButton.setOnAction(event -> mainPresenter.onClickOpenPulsationPlot());
         TilePane pulsationTilePane = new TilePane();
+        pulsationTilePane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         pulsationTilePane.getChildren().add(pulsationPlotToggleButton);
 
         return pulsationTilePane;
@@ -57,49 +61,37 @@ public class MainView extends Application implements MainPresenter.View {
 
     private TilePane createLowPassFilterTilePane(MainPresenter mainPresenter) {
 
-        Label frecuencyLabel = new Label("Frecuency");
-        TextField frecuencyTextField = new TextField();
-        frecuencyTextField.setDisable(lowPassFilterIsActive);
-        frecuencyTextField.appendText("0");
-
-        Label orderLabel = new Label("Order");
-        TextField orderTextField = new TextField();
-        orderTextField.setDisable(lowPassFilterIsActive);
-        orderTextField.appendText("0");
-
-        ToggleButton lowPassFilterToggleButton = new ToggleButton("Low Pass Filter Plot");
-        Button lowPassFilterApplyButton = new Button("Apply");
+        ToggleButton lowPassFilterToggleButton = new ToggleButton("Filter");
+        Button lowPassFilterApplyButton = new Button("Apply to Signal");
         lowPassFilterApplyButton.setDisable(lowPassFilterIsActive);
-        
-        Button plotSignalButton = new Button("Plot Signal");
-        plotSignalButton.setOnAction(event -> {
-        	mainPresenter.onClickPlotSignal();
-        });
 
         lowPassFilterToggleButton.setOnAction(event -> {
         	mainPresenter.onClickLowPassFilterPlot();
             lowPassFilterApplyButton.setDisable(!lowPassFilterIsActive);
-            orderTextField.setDisable(!lowPassFilterIsActive);
             lowPassFilterIsActive = !lowPassFilterIsActive;
         });
 
-        lowPassFilterApplyButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply(
-                Integer.getInteger(frecuencyTextField.getText()),
-                Integer.getInteger(orderTextField.getText())));
+        lowPassFilterApplyButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply());
 
         TilePane lowPassFilterTilePane = new TilePane();
+        lowPassFilterTilePane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         
-		lowPassFilterTilePane.getChildren().addAll(lowPassFilterToggleButton, lowPassFilterApplyButton, plotSignalButton);
+		lowPassFilterTilePane.getChildren().addAll(lowPassFilterToggleButton, lowPassFilterApplyButton);
 
-        TilePane frecuencyTilePane = new TilePane();
-        frecuencyTilePane.getChildren().addAll(frecuencyLabel, frecuencyTextField);
+        return lowPassFilterTilePane;
+    }
 
-        TilePane orderTilePane = new TilePane();
-        orderTilePane.getChildren().addAll(orderLabel, orderTextField);
+    private TilePane createPlotSignalTilePane(MainPresenter mainPresenter) {
 
-        TilePane lowPassTilePane = new TilePane();
-        lowPassTilePane.getChildren().addAll(lowPassFilterTilePane, frecuencyTilePane, orderTilePane);
+        Button plotSignalButton = new Button("Plot Signal");
+        plotSignalButton.setOnAction(event -> mainPresenter.onClickPlotSignal());
 
-        return lowPassTilePane;
+        TilePane plotSignalTilePane = new TilePane();
+        plotSignalTilePane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        plotSignalTilePane.getChildren().add(plotSignalButton);
+
+        return plotSignalTilePane;
     }
 }

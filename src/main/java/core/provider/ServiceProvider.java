@@ -20,7 +20,7 @@ public class ServiceProvider {
     }
 
     public static LowPassFilterService provideLowPassFilterService() {
-    	return new LowPassFilterService(FunctionProvider.provideLinearConvolve(), FunctionProvider.provideFFT());
+    	return new LowPassFilterService(FunctionProvider.provideLinearConvolve());
     }
     
     public static PulsationService providePulsationService() {

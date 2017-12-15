@@ -5,26 +5,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import core.function.FFT;
+import core.function.InverseFFT;
 import core.function.LinearConvolve;
 import core.model.Complex;
 
 public class LowPassFilterService {
 
     private final LinearConvolve linearConvolve;
-    private FFT fft;
 
-    public LowPassFilterService(LinearConvolve linearConvolve, FFT fft) {
+    public LowPassFilterService(LinearConvolve linearConvolve) {
         this.linearConvolve = linearConvolve;
-        this.fft = fft;
     }
 
-    public List<Double> apply(List<Double> data, List<Double> filterData, Integer frecuency, Integer order) {
+    public List<Double> apply(List<Double> data, List<Double> filterData) {
 
-        Complex[] dataAsComplex = dataPowerOfTwo(data);
+        Complex[] dataAsComplex = toPowerOfTwo(data);
 
-        Complex[] filterDataAsComplex = dataPowerOfTwo(filterData);
+        Complex[] filterDataAsComplex = InverseFFT.build(toPowerOfTwo(filterData));
 
-        Complex[] filteredData = applyLinearConvolve(dataAsComplex, filterDataAsComplex);
+        Complex[] filteredData = FFT.build(applyLinearConvolve(dataAsComplex, filterDataAsComplex));
 
         return Arrays.stream(filteredData).map(Complex::re).collect(Collectors.toList());
     }
@@ -53,23 +52,25 @@ public class LowPassFilterService {
         return dataResult;
     }
 
-    private Complex[] dataPowerOfTwo(List<Double> data) {
+    private Complex[] toPowerOfTwo(List<Double> data) {
+
         Complex[] dataAsComplex = toComplex(data);
 
         int dataLength = dataAsComplex.length;
-        double powerOf2 = powerOf2(dataLength);
+        double pow = Math.pow(2, Math.round(Math.log(dataLength) / Math.log(2)));
+        double powerOf2 = pow < dataLength ? pow : pow/2;
+
         if (powerOf2 != dataLength) {
             dataLength = (int) powerOf2;
         }
+
         Complex[] dataPowerOfTwo = new Complex[dataLength];
+
         for (int i = 0; i < dataLength; i++) {
             dataPowerOfTwo[i] = dataAsComplex[i];
         }
-        return dataPowerOfTwo;
-    }
 
-    private static double powerOf2(int number) {
-        return Math.pow(2, Math.round(Math.log(number) / Math.log(2)));
+        return dataPowerOfTwo;
     }
 
     public Complex[] toComplex(List<Double> points) {

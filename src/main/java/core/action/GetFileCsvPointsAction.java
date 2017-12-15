@@ -94,9 +94,13 @@ public class GetFileCsvPointsAction {
             		continue;
             	}
             	
-            	if(isValidRow && registry != "") {
-            		data.add(Double.parseDouble(registry));
-            	}                
+            	if(isValidRow && registry.length() != 0) {
+            	    try {
+                        data.add(Double.parseDouble(registry));
+                    } catch (NumberFormatException e) {
+            	        e.printStackTrace();
+                    }
+            	}
             }
 
             buffer.close();

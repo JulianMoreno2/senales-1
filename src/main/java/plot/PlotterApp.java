@@ -28,8 +28,8 @@ public class PlotterApp {
         SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }
 
-    public void startLowPassFilterPlot(List<Double> points) throws IOException {
-    	Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Low Pass Filter");
+    public void startSimplePlot(List<Double> points) throws IOException {
+    	Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Plot");
 
         SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }

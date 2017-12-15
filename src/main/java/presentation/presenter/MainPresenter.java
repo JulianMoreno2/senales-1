@@ -1,17 +1,11 @@
 package presentation.presenter;
 
-import core.action.GetFileCsvPointsAction;
-import core.action.LowPassFilterPlotAction;
-import core.action.PulsationPlotAction;
-import core.action.SaveFilterAction;
-import core.action.GetSignalFrecuencyAction;
-import core.service.io.OpenFileService;
+import core.action.*;
 import core.util.FilterKeys;
 import presentation.presenter.Presenter.View;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,8 +35,8 @@ public class MainPresenter extends Presenter<View> {
         pulsationPlotAction.execute(loadFileAsList());
     }
 
-    public void onClickLowPassFilterApply(Integer frecuency, Integer order) {
-        lowPassFilterPlotAction.execute(loadNewFile(), frecuency, order);
+    public void onClickLowPassFilterApply() {
+        lowPassFilterPlotAction.execute(loadNewFile());
     }
 
     public void onClickLowPassFilterPlot() {

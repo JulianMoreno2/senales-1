@@ -57,8 +57,15 @@ public class Complex {
 
     public Complex times(Complex b) {
         Complex a = this;
-        double real = a.re * b.re - a.im * b.im;
-        double imag = a.re * b.im + a.im * b.re;
+        double real = 0;
+        double imag = 0;
+        try{
+            real = a.re * b.re - a.im * b.im;
+            imag = a.re * b.im + a.im * b.re;
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
         return new Complex(real, imag);
     }
 

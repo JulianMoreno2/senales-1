@@ -18,13 +18,13 @@ public class LowPassFilterPlotAction {
         this.filterRepository = filterRepository;
     }
 
-    public void execute(List<Double> signalData, Integer frecuency, Integer order) {
+    public void execute(List<Double> signalData) {
 
         List<Double> filterData = this.filterRepository.get(FilterKeys.LOW_PASS_FILTER);
-		List<Double> points = this.lowPassFilterService.apply(signalData, filterData, frecuency, order);
+		List<Double> points = this.lowPassFilterService.apply(signalData, filterData);
 
         try {
-            PlotterAppProvider.provide().startLowPassFilterPlot(points);
+            PlotterAppProvider.provide().startSimplePlot(points);
         } catch (IOException e) {
             e.printStackTrace();
         }
