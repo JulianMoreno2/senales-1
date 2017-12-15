@@ -11,7 +11,7 @@ public class PlotBuilder extends Builder {
 
         Plot plot = new Plot();
 
-        plot.setSize(350, 300);
+        plot.setSize(50, 50);
         plot.setButtons(true);
         plot.setTitle(title);
 

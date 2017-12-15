@@ -17,13 +17,13 @@ public class PlotterApp {
         this.plotBuilder = plotBuilder;
     }
 
-    public void startPulsationPlot(List<Double> points,
-                                   Integer quantityPulsation,
-                                   Integer arrhythmiaQuantityPoint) throws IOException {
+    public void startPulsationPlot(List<Double> points,String title) throws IOException {
 
-        Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Pulsations per minute:"
+      /*  Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, "Pulsations per minute:"
                 + String.valueOf(quantityPulsation + "  ArrhythmiaQuantityPoint: "
-                + String.valueOf(arrhythmiaQuantityPoint)));
+                + String.valueOf(arrhythmiaQuantityPoint)));*/
+    	
+    	Plot[] plotCsvFile = plotBuilder.buildPlotFromCsv(points, title);
 
         SwingUtilities.invokeLater(() -> new PlotApplication(plotCsvFile[0]));
     }
