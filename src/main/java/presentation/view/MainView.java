@@ -66,12 +66,12 @@ public class MainView extends Application implements MainPresenter.View {
         lowPassFilterApplyButton.setDisable(lowPassFilterIsActive);
 
         lowPassFilterToggleButton.setOnAction(event -> {
-        	mainPresenter.onClickLowPassFilterPlot();
+        	mainPresenter.onClickFilterPlot();
             lowPassFilterApplyButton.setDisable(!lowPassFilterIsActive);
             lowPassFilterIsActive = !lowPassFilterIsActive;
         });
 
-        lowPassFilterApplyButton.setOnAction(event -> mainPresenter.onClickLowPassFilterApply());
+        lowPassFilterApplyButton.setOnAction(event -> mainPresenter.onClickFilterApply());
 
         TilePane lowPassFilterTilePane = new TilePane();
         lowPassFilterTilePane.setBorder(new Border(new BorderStroke(Color.BLACK,

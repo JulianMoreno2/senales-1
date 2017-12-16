@@ -35,12 +35,12 @@ public class MainPresenter extends Presenter<View> {
         pulsationPlotAction.execute(loadFileAsList());
     }
 
-    public void onClickLowPassFilterApply() {
+    public void onClickFilterApply() {
         lowPassFilterPlotAction.execute(loadNewFile());
     }
 
-    public void onClickLowPassFilterPlot() {
-    	saveFilterAction.execute(FilterKeys.LOW_PASS_FILTER, loadFilterFile());
+    public void onClickFilterPlot() {
+    	saveFilterAction.execute(FilterKeys.FILTER, loadFilterFile());
     }
 
     public void onClickPlotSignal() {
@@ -61,6 +61,10 @@ public class MainPresenter extends Presenter<View> {
 
         try {
             Map<String, String> map = getFileCsvPointsAction.getDataFileCsvAsMap();
+
+            if (map.isEmpty()) {
+                return new ArrayList<>();
+            }
             
             List<Map.Entry<String, String>> entries = new ArrayList<>(map.entrySet());
             return entries.subList(2, entries.size()).stream()

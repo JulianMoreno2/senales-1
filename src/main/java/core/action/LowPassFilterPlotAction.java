@@ -20,7 +20,7 @@ public class LowPassFilterPlotAction {
 
     public void execute(List<Double> signalData) {
 
-        List<Double> filterData = this.filterRepository.get(FilterKeys.LOW_PASS_FILTER);
+        List<Double> filterData = this.filterRepository.get(FilterKeys.FILTER);
 		List<Double> points = this.lowPassFilterService.apply(signalData, filterData);
 
         try {

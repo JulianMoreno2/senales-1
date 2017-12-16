@@ -21,9 +21,9 @@ public class LowPassFilterService {
 
         Complex[] dataAsComplex = toPowerOfTwo(data);
 
-        Complex[] filterDataAsComplex = InverseFFT.build(toPowerOfTwo(filterData));
+        Complex[] filterDataAsComplex = InverseFFT.build(toComplex(filterData));
 
-        Complex[] filteredData = FFT.build(applyLinearConvolve(dataAsComplex, filterDataAsComplex));
+        Complex[] filteredData = applyLinearConvolve(dataAsComplex, filterDataAsComplex);
 
         return Arrays.stream(filteredData).map(Complex::re).collect(Collectors.toList());
     }

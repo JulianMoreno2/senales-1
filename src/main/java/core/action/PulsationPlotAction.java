@@ -1,14 +1,11 @@
 package core.action;
 
-import core.function.FFT;
 import core.model.Complex;
 import core.provider.PlotterAppProvider;
 import core.service.pulsation.PulsationService;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PulsationPlotAction {
 
@@ -22,12 +19,8 @@ public class PulsationPlotAction {
         int pulsationsQuantity = pulsationService.getPulsationsQuantity(data);
         int arrhythmiaQuantityPoint = pulsationService.getArrhythmiaQuantityPoint(data);
 
-        Complex[] dataAsComplex = FFT.build(toPowerOfTwo(data));
-
-        List<Double> collect = Arrays.stream(dataAsComplex).map(Complex::re).collect(Collectors.toList());
-
         try {
-            PlotterAppProvider.provide().startPulsationPlot(collect, pulsationsQuantity, arrhythmiaQuantityPoint);
+            PlotterAppProvider.provide().startPulsationPlot(data, pulsationsQuantity, arrhythmiaQuantityPoint);
         } catch (IOException e) {
             e.printStackTrace();
         }
