@@ -3,6 +3,7 @@ package core.action;
 import core.service.io.OpenFileService;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.*;
 public class GetFileCsvPointsAction {
 
     private OpenFileService openFileService;
+    private String absolutePath = "";
 
     public GetFileCsvPointsAction(OpenFileService openFileService) {
         this.openFileService = openFileService;
@@ -122,7 +124,7 @@ public class GetFileCsvPointsAction {
     }
     
     private String getFilePath() {
-        String absolutePath = "";
+
         try {
             absolutePath = openFileService.openFile().getAbsolutePath();
         }catch (NullPointerException e) {
@@ -132,5 +134,8 @@ public class GetFileCsvPointsAction {
         return absolutePath;
     }
 
+    public String getFileName() {
+        return absolutePath.isEmpty() ? getFilePath() : absolutePath;
+    }
 
 }
