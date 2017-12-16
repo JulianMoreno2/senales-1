@@ -1,5 +1,6 @@
 package core.provider;
 
+import core.function.FFT;
 import core.function.LinearConvolve;
 
 public class FunctionProvider {
@@ -8,4 +9,7 @@ public class FunctionProvider {
 		return new LinearConvolve();
 	}
 
+	public static FFT provideFFT() {
+		return new FFT();
+	}
 }

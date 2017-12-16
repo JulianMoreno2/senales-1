@@ -2,7 +2,7 @@ package core.function;
 
 import core.model.Complex;
 
-class InverseFFT {
+public class InverseFFT {
 
     public static Complex[] build(Complex[] x) {
         int n = x.length;

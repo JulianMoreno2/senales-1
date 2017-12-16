@@ -2,7 +2,7 @@ package core.function;
 
 import core.model.Complex;
 
-class CircularConvolve {
+public class CircularConvolve {
 
     public static Complex[] build(Complex[] x, Complex[] y) {
 

@@ -1,17 +1,11 @@
 package presentation.presenter;
 
-import core.action.GetFileCsvPointsAction;
-import core.action.LowPassFilterPlotAction;
-import core.action.PulsationPlotAction;
-import core.action.SaveFilterAction;
-import core.action.GetSignalFrecuencyAction;
-import core.service.io.OpenFileService;
+import core.action.*;
 import core.util.FilterKeys;
 import presentation.presenter.Presenter.View;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -41,12 +35,12 @@ public class MainPresenter extends Presenter<View> {
         pulsationPlotAction.execute(loadFileAsList());
     }
 
-    public void onClickLowPassFilterApply(Integer frecuency, Integer order) {
-        lowPassFilterPlotAction.execute(loadNewFile(), frecuency, order);
+    public void onClickFilterApply() {
+        lowPassFilterPlotAction.execute(loadNewFile());
     }
 
-    public void onClickLowPassFilterPlot() {
-    	saveFilterAction.execute(FilterKeys.LOW_PASS_FILTER, loadFilterFile());
+    public void onClickFilterPlot() {
+    	saveFilterAction.execute(FilterKeys.FILTER, loadFilterFile());
     }
 
     public void onClickPlotSignal() {
@@ -67,6 +61,10 @@ public class MainPresenter extends Presenter<View> {
 
         try {
             Map<String, String> map = getFileCsvPointsAction.getDataFileCsvAsMap();
+
+            if (map.isEmpty()) {
+                return new ArrayList<>();
+            }
             
             List<Map.Entry<String, String>> entries = new ArrayList<>(map.entrySet());
             return entries.subList(2, entries.size()).stream()

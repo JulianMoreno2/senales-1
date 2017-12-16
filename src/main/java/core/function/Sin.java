@@ -2,7 +2,7 @@ package core.function;
 
 import core.model.Complex;
 
-class Sin {
+public class Sin {
 
     public Complex[] points(int pointsAmount){
 

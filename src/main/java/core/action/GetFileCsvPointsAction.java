@@ -18,6 +18,9 @@ public class GetFileCsvPointsAction {
     public ArrayList<Double> getArrayListDataFileCsv() throws IOException {
 
         String path = getFilePath();
+        if (path.equals("")) {
+            return new ArrayList<>();
+        }
 
         String registry;
         BufferedReader buffer = null;
@@ -47,6 +50,9 @@ public class GetFileCsvPointsAction {
     public Map<String, String> getDataFileCsvAsMap() throws IOException {
 
         String path = getFilePath();
+        if(path.equals("")) {
+            return new HashMap<>();
+        }
 
         String registry;
         BufferedReader buffer = null;
@@ -77,6 +83,9 @@ public class GetFileCsvPointsAction {
     public List<Double> getFilterDataFileCsv() throws IOException {
     	
     	String path = getFilePath();
+    	if (path.equals("")) {
+    	    return new ArrayList<>();
+        }
 
         String registry;
         BufferedReader buffer = null;
@@ -94,9 +103,13 @@ public class GetFileCsvPointsAction {
             		continue;
             	}
             	
-            	if(isValidRow && registry != "") {
-            		data.add(Double.parseDouble(registry));
-            	}                
+            	if(isValidRow && registry.length() != 0) {
+            	    try {
+                        data.add(Double.parseDouble(registry));
+                    } catch (NumberFormatException e) {
+            	        e.printStackTrace();
+                    }
+            	}
             }
 
             buffer.close();
@@ -109,7 +122,14 @@ public class GetFileCsvPointsAction {
     }
     
     private String getFilePath() {
-        return openFileService.openFile().getAbsolutePath();
+        String absolutePath = "";
+        try {
+            absolutePath = openFileService.openFile().getAbsolutePath();
+        }catch (NullPointerException e) {
+            //Ignored
+        }
+
+        return absolutePath;
     }
 
 
